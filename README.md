@@ -9,10 +9,11 @@ I implemented this wrapper class for the Neo4J query language because seraph can
 
 # How to use
 1. Download repository into a library folder (later it should be a npm module).
-2. Install the module 'seraph' via _npm install seraph_.
-3. Import both, seraph and Neo4jQuery, with 'require' and connect to your Neo4J graph database 
+2. Install the module `underscore` via __npm install underscore__.
+3. Install the module `seraph` via __npm install seraph__.
+4. Import both, seraph and Neo4jQuery, with 'require' and connect to your Neo4J graph database 
 
-_Quick example_
+__Quick example__
 ```javascript
 var seraph = require("seraph")({
 	"http://localhost:7474",
