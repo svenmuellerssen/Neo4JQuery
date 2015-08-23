@@ -1,6 +1,4 @@
-var configuration = require('../../config/configuration')
-  , configurationParams = configuration.getParams()
-  , _ = require('underscore');
+var _ = require('underscore');
 
 
 var Graph = function() {
