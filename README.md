@@ -26,6 +26,35 @@ var seraph = require("seraph")({
 ```
 
 #Documentation
+<a name="query" />
+### Query(query, parameters, callback)
+Executes a given query directly. Using parameters for parameterized cypher queries.
+
+__Arguments__
+
+* `query` (string)- The placeholder of the node or relationship.
+* `parameters` (object) - Parameters to filter nodes.
+* `callback` (function) - Callback function with parameters 'error' and 'array list'.
+
+__Example__
+
+```javascript
+var db = require(<path to Neo4jQuery>)
+    , query = "MATCH (n:Node)-[r:RELATIONSHIP {...}]-(m) WHERE n.field1=? AND r.field2=? RETURN n, r, m"
+    , parameters = ["value1", "value2"]
+
+    db
+      .reset()
+      .Query(query, parameters, function(err, list) {
+        if (err || void 0 === list) {
+          callback(err, void 0);
+        } else {
+          // some stuff here with list
+          var user = list[0];
+        }
+      });
+```
+
 <a name="match" />
 ### Match(placeholder, label, parameters)
 Matches data specified through labels and parameters and bound to the placeholder.
@@ -42,7 +71,34 @@ __Example__
 var db = require(<path to Neo4jQuery>)
     db
       .reset()
-      .Match('n', 'User', {username: 'neo4jqueryuser', password: 'password'})
+      .Match('n', 'node', {field1: '...', field2: '...'})
+      .run(['n'], function(err, list) {
+        if (err || void 0 === list) {
+          callback(err, void 0);
+        } else {
+          // some stuff here with list
+          var user = list[0];
+        }
+      });
+```
+
+<a name="merge" />
+### Merge(placeholder, label, parameters)
+Try to create and insert new node with given parameters and label.
+
+__Arguments__
+
+* `placeholder` (string)- The placeholder of the node or relationship.
+* `label` (string)- The labels which are assigned to nodes.
+* `parameters` (object) - Parameters to filter nodes.
+
+__Example__
+
+```javascript
+var db = require(<path to Neo4jQuery>)
+    db
+      .reset()
+      .Merge('n', 'Node', {field1: '...', field2: '...', createdAt: 120987654321})
       .run(['n'], function(err, list) {
         if (err || void 0 === list) {
           callback(err, void 0);
