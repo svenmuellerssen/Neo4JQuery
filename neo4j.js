@@ -1,4 +1,5 @@
-var _ = require('underscore');
+var _ = require('underscore')
+  , _instance = null;
 
 
 var Graph = function() {
@@ -9,12 +10,18 @@ var Graph = function() {
     , parameters = {}
     , cachedQuery = '';
 
+  /**
+   *
+   * @param graphConnection
+   * @returns {Graph}
+   */
   this.setConnection = function(graphConnection) {
     connection = graphConnection;
 
     if (!_.isNull(connection) && !_.isUndefined(connection)) {
       console.log('Connected to database "Neo4J".');
     }
+    return this;
   };
 
 
@@ -39,7 +46,7 @@ var Graph = function() {
    * @param placeholder
    * @param label
    * @param parameter
-   * @returns {Neo4JWrapper}
+   * @returns {Graph}
    */
   this.Match = function(placeholder, label, parameter) {
     placeholder = placeholder || null;
@@ -69,7 +76,7 @@ var Graph = function() {
    * @param placeholder
    * @param label
    * @param parameter
-   * @returns {Neo4JWrapper}
+   * @returns {Graph}
    */
   this.Merge = function(placeholder, label, parameter) {
     placeholder = placeholder || null;
@@ -105,7 +112,7 @@ var Graph = function() {
    * @param placeholder
    * @param label
    * @param parameter
-   * @returns {Neo4JWrapper}
+   * @returns {Graph}
    */
   this.MergeRelationShip = function(nodes, placeholder, label, parameter) {
     nodes = nodes || [];
@@ -186,7 +193,7 @@ var Graph = function() {
    * @param relParameter
    * @param endNode
    * @param parameter
-   * @returns {Neo4JWrapper}
+   * @returns {Graph}
    */
   this.RelateNodes = function(placeholder, label, relParameter, endNode, parameter) {
     if (queries.length > 0) {
@@ -210,7 +217,7 @@ var Graph = function() {
   /**
    *
    * @param placeholder
-   * @returns {Neo4JWrapper}
+   * @returns {Graph}
    * @constructor
    */
   this.Delete = function(placeholder) {
@@ -235,7 +242,7 @@ var Graph = function() {
   /**
    *
    * @param placeholders
-   * @returns {Neo4JWrapper}
+   * @returns {Graph}
    */
   this.With = function(placeholders) {
     if (Array.isArray(placeholders) && placeholders.length !== 0) {
@@ -250,7 +257,7 @@ var Graph = function() {
    *
    * @param placeholder
    * @param parameter
-   * @returns {Neo4JWrapper}
+   * @returns {Graph}
    * @constructor
    */
   this.Set = function(placeholder, parameter) {
@@ -268,7 +275,7 @@ var Graph = function() {
    *
    * @param string
    * @param parameter
-   * @returns {Neo4JWrapper}
+   * @returns {Graph}
    * @constructor
    */
   this.Where = function(string, parameter) {
@@ -288,7 +295,7 @@ var Graph = function() {
    *
    * @param list
    * @param query
-   * @returns {Neo4JWrapper}
+   * @returns {Graph}
    * @constructor
    */
   this.ForeachArray = function(list, query) {
@@ -308,7 +315,7 @@ var Graph = function() {
    *
    * @param condition
    * @param query
-   * @returns {Neo4JWrapper}
+   * @returns {Graph}
    * @constructor
    */
   this.ForeachCondition = function(condition, query) {
@@ -327,7 +334,7 @@ var Graph = function() {
    *
    * @param idName
    * @param additionalPlaceholders
-   * @returns {Neo4JWrapper}
+   * @returns {Graph}
    */
   this.createUniqueId = function(idName, additionalPlaceholders) {
     if (!Array.isArray(additionalPlaceholders) || additionalPlaceholders.length == 0)
@@ -352,7 +359,7 @@ var Graph = function() {
 
   /**
    *
-   * @returns {Neo4JWrapper}
+   * @returns {Graph}
    */
   this.reset = function() {
     QueryPlaceholders = [];
@@ -364,24 +371,9 @@ var Graph = function() {
 
   /**
    *
-   * @param operation
-   * @param callback
+   * @param placeholder
+   * @returns {Graph}
    */
-  this.call = function(operation, callback) {
-    connection.call(operation, callback);
-  };
-
-  /**
-   *
-   * @param path
-   * @param method
-   * @param data
-   * @returns {*}
-   */
-  this.operation = function(path, method, data) {
-    return connection.operation(path, method, data);
-  };
-
   this.addQueryPlaceholder = function(placeholder) {
     placeholder = placeholder || null;
 
@@ -486,5 +478,21 @@ var Graph = function() {
     return string;
   }
 };
+
+/**
+ *
+ * @param connection
+ * @returns {*}
+ */
+Graph.singleton = function(connection) {
+  connection = connection || null;
+
+  if (_.isNull(_instance)) {
+    _instance = new Graph();
+    if (!_.isNull(connection)) _instance.setConnection(connection);
+  }
+
+  return _instance;
+}
 
 module.exports = Graph;
