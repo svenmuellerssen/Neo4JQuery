@@ -40,7 +40,7 @@ __Example__
 
 ```javascript
 var db = require(<path to Neo4jQuery>)
-    , query = "MATCH (n:Node)-[r:RELATIONSHIP {...}]-(m) WHERE n.field1=? AND r.field2=? RETURN n, r, m"
+    , query = "MATCH (n:Node) WHERE n.field1=? AND r.field2=? RETURN n"
     , parameters = ["value1", "value2"]
 
     db
