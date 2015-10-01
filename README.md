@@ -213,7 +213,6 @@ var graph = require(<path to Neo4JQuery>).singleton()
 <a name="delete2" />
 ### delete(obj, callback)
 Deletes the node object. This overrides the NodeJS driver method and pass-through the parameters.
-
 At the moment the method awaits a seraph node object but will be adapted to only pass-in a javascript literal object.
 
 __Please don't use this function. It is not working properly now.__
