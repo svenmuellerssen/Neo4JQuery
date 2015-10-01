@@ -43,7 +43,7 @@ __Example__
 ```javascript
 var graph = require(<path to Neo4JQuery>).singleton()
 
-    graph.__setConnection(<driver object>)__;
+    graph.setConnection(<driver object>);
 ```
 <a name="reset" />
 ### reset()
@@ -59,7 +59,7 @@ var graph = require(<path to Neo4JQuery>).singleton()
     , query = "MATCH (n:Node) WHERE n.field1=? AND r.field2=? RETURN n"
     , parameters = ["value1", "value2"]
 
-    graph.__reset()__;
+    graph.reset();
 ```
 
 <a name="query" />
@@ -81,7 +81,7 @@ var graph = require(<path to Neo4JQuery>).singleton()
 
     graph
       .reset()
-      .__Query(query, parameters, function(err, list)__ {
+      .Query(query, parameters, function(err, list) {
         if (err || void 0 === list) {
           callback(err, void 0);
         } else {
@@ -107,7 +107,7 @@ __Example__
 var graph = require(<path to Neo4JQuery>).singleton()
     graph
       .reset()
-      .__Match('n', 'node', {field1: '...', field2: '...'})__
+      .Match('n', 'node', {field1: '...', field2: '...'})
       .run(['n', ...], function(err, list) {
         if (err || void 0 === list) {
           callback(err, void 0);
@@ -134,7 +134,7 @@ __Example__
 var graph = require(<path to Neo4JQuery>).singleton()
     graph
       .reset()
-      .__Merge('n', 'User', {field1: '...', field2: '...', createdAt: 120987654321})__
+      .Merge('n', 'User', {field1: '...', field2: '...', createdAt: 120987654321})
       .run(['n', ...], function(err, list) {
         if (err || void 0 === list) {
           callback(err, void 0);
@@ -168,7 +168,7 @@ var graph = require(<path to Neo4JQuery>).singleton()
       .With(['u'])
       .Merge('n', 'Node', {field1: '...', field2: '...', createdAt: 120987654321})
       .With(['u', 'n'])
-      .__MergeRelationShip(['n', 'u'], 'r', 'ASSIGNED_WITH_EACH_OTHER', {field1: '...', field2: '...'})__
+      .MergeRelationShip(['n', 'u'], 'r', 'ASSIGNED_WITH_EACH_OTHER', {field1: '...', field2: '...'})
       .run(['n', 'u', ...], function(err, list) {
         if (err || void 0 === list) {
           callback(err, void 0);
@@ -197,7 +197,7 @@ var graph = require(<path to Neo4JQuery>).singleton()
       .With(['u'])
       .Match('u2', 'User', {})
       .With(['u', 'u2'])
-      .__Delete(['u', 'u2', ...])__
+      .Delete(['u', 'u2', ...])
       .run([], function(err, list) {
         if (err || void 0 === list) {
           callback(err, void 0);
@@ -223,18 +223,18 @@ __Example__
 var graph = require(<path to Neo4JQuery>).singleton()
 
     graph
-		.reset()
-		.Match('n', 'User', {username: 'neo4jqueryuser', password: 'password'})
-		.__With(['n', ...])__
-		.MergeRelationShip(['n', ...], 'r', 'ASSIGNED_WITH_EACH_OTHER', {field1: '...', field2: '...'})
-		.run(['n', ...], function(err, list) {
-		  if (err || void 0 === list) {
-			callback(err, void 0);
-		  } else {
-			// some stuff here with list
-			var user = list[0];
-		  }
-		});
+	.reset()
+	.Match('n', 'User', {username: 'neo4jqueryuser', password: 'password'})
+	.With(['n', ...])
+	.MergeRelationShip(['n', ...], 'r', 'ASSIGNED_WITH_EACH_OTHER', {field1: '...', field2: '...'})
+	.run(['n', ...], function(err, list) {
+	  if (err || void 0 === list) {
+		callback(err, void 0);
+	  } else {
+		// some stuff here with list
+		var user = list[0];
+	  }
+	});
 ```
 
 <a name="set" />
@@ -254,7 +254,7 @@ var graph = require(<path to Neo4JQuery>).singleton()
     graph
       .reset()
       .Match('n', 'User', {username: 'neo4jqueryuser', password: 'password'})
-      .__Set('n', {createdAt: 1440360134452, updatedAt: 1440360134452})__
+      .Set('n', {createdAt: 1440360134452, updatedAt: 1440360134452})
       .run(['n'], function(err, list) {
         if (err || void 0 === list) {
           callback(err, void 0);
@@ -282,7 +282,7 @@ var graph = require(<path to Neo4JQuery>).singleton()
     graph
       .reset()
       .Match('n', 'User', {username: 'neo4jqueryuser', password: 'password'})
-      .__Where("n.username={neo4jqueryuser} and n.password={password}", {neo4jqueryuser: '...', password: '...'})__
+      .Where("n.username={neo4jqueryuser} and n.password={password}", {neo4jqueryuser: '...', password: '...'})
       .run(['n'], function(err, list) {
         if (err || void 0 === list) {
           callback(err, void 0);
@@ -312,12 +312,12 @@ var graph = require(<path to Neo4JQuery>).singleton()
       .reset()
       .Match('n', 'User', {username: 'neo4jqueryuser', password: 'password'})
       .Where("n.username={neo4jqueryuser} and n.password={password}", {neo4jqueryuser: '...', password: '...'})
-      .__run(['n'], function(err, list) {
+      .run(['n'], function(err, list) {
         if (err || void 0 === list) {
           callback(err, void 0);
         } else {
           // some stuff here with list
           var user = list[0];
         }
-      })__;
+      });
 ```
