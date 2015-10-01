@@ -195,21 +195,21 @@ var Graph = function() {
    * @param parameter
    * @returns {Graph}
    */
-  this.RelateNodes = function(placeholder, label, relParameter, endNode, parameter) {
-    if (queries.length > 0) {
-      endNode = endNode || null;
-      parameter = parameter || {};
-
-      var me = this
-        , string = '-[' + placeholder + ':' + label + ' ' + me.prepareParameter(':', relParameter) + ']-';
-
-      if (!isNaN(parseInt(endNode)))
-        string = this.prepareEndNode(string, endNode, parameter);
-      else if (typeof endNode === 'string')
-        string += '(' + endNode + ')';
-
-      queries.push(string);
-    }
+//  this.RelateNodes = function(placeholder, label, relParameter, endNode, parameter) {
+//    if (queries.length > 0) {
+//      endNode = endNode || null;
+//      parameter = parameter || {};
+//
+//      var me = this
+//        , string = '-[' + placeholder + ':' + label + ' ' + me.prepareParameter(':', relParameter) + ']-';
+//
+//      if (!isNaN(parseInt(endNode)))
+//        string = this.prepareEndNode(string, endNode, parameter);
+//      else if (typeof endNode === 'string')
+//        string += '(' + endNode + ')';
+//
+//      queries.push(string);
+//    }
 
     return this;
   };
