@@ -160,7 +160,8 @@ __Arguments__
 __Example__
 
 ```javascript
-// Here the first value in the nodes array points to the second value via relationship 'ASSIGNED_WITH_EACH_OTHER'!
+// Here the first value in the nodes array points to the second value 
+// via relationship 'ASSIGNED_WITH_EACH_OTHER'!
 var graph = require(<path to Neo4JQuery>).singleton()
     graph
       .reset()
@@ -178,6 +179,7 @@ var graph = require(<path to Neo4JQuery>).singleton()
         }
       });
 ```
+
 <a name="delete" />
 ### Delete(placeholder)
 Try to delete all the given nodes/relationships.
@@ -199,6 +201,30 @@ var graph = require(<path to Neo4JQuery>).singleton()
       .With(['u', 'u2'])
       .Delete(['u', 'u2', ...])
       .run([], function(err, list) {
+        if (err || void 0 === list) {
+          callback(err, void 0);
+        } else {
+          // some stuff here with list
+          var user = list[0];
+        }
+      });
+```
+
+<a name="delete2" />
+### delete(obj, callback)
+Deletes the node object. This overrides the NodeJS driver method and pass-through the parameters.
+__Please don't use this function. It is not working properly now.__
+__Arguments__
+
+* `obj` (object) - the node object that has to be deleted.
+* `callback` (function) - The callback function for async processing.
+
+__Example__
+
+```javascript
+var graph = require(<path to Neo4JQuery>).singleton()
+    graph
+      .delete({field1: ..., field2: ...}, function(err, list) {
         if (err || void 0 === list) {
           callback(err, void 0);
         } else {
