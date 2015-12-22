@@ -1,4 +1,5 @@
-var _ = require('underscore');
+var _instance = null
+  , _ = require('underscore');
 
 
 var Builder = function() {
@@ -11,7 +12,7 @@ var Builder = function() {
    *
    * @returns {string}
    */
-  this.getQuery = function(placeholders) {
+  this.getQuery = function() {
     var me = this
       , query = "";
 
@@ -20,18 +21,24 @@ var Builder = function() {
       query = queries.join('\n');
 
       // Get the placeholders for return them.
-      if (Array.isArray(placeholders) && placeholders.length > 0) {
+      if (Array.isArray(QueryPlaceholders) && QueryPlaceholders.length > 0) {
         // Return placeholders.
-        query = query + ' RETURN ' + placeholders.join(', ');
+        query = query + ' RETURN ' + QueryPlaceholders.join(', ');
       } else {
         query += query + ' RETURN * ';
       }
     }
 
-
     return query;
   };
 
+  /**
+   *
+   * @returns {object}
+   */
+  this.getParameters = function() {
+    return parameters;
+  };
   /**
    *
    * @returns {boolean}
@@ -44,7 +51,7 @@ var Builder = function() {
    * @param placeholder
    * @param label
    * @param parameter
-   * @returns {Graph}
+   * @returns {Builder}
    */
   this.Match = function(placeholder, label, parameter) {
     placeholder = placeholder || null;
@@ -75,7 +82,7 @@ var Builder = function() {
    * @param placeholder
    * @param label
    * @param parameter
-   * @returns {Graph}
+   * @returns {Builder}
    */
   this.Merge = function(placeholder, label, parameter) {
     placeholder = placeholder || null;
@@ -111,7 +118,7 @@ var Builder = function() {
    * @param placeholder
    * @param label
    * @param parameter
-   * @returns {Graph}
+   * @returns {Builder}
    */
   this.MergeRelationShip = function(nodes, placeholder, label, parameter) {
     nodes = nodes || [];
@@ -152,7 +159,7 @@ var Builder = function() {
   /**
    *
    * @param condUpdate
-   * @returns {Graph}
+   * @returns {Builder}
    */
   this.onCreate = function(condUpdate) {
     condUpdate = condUpdate || null;
@@ -170,7 +177,7 @@ var Builder = function() {
   /**
    *
    * @param condUpdate
-   * @returns {Graph}
+   * @returns {Builder}
    */
   this.onMatch = function(condUpdate) {
     condUpdate = condUpdate || null;
@@ -188,8 +195,7 @@ var Builder = function() {
   /**
    *
    * @param placeholder
-   * @returns {Graph}
-   * @constructor
+   * @returns {Builder}
    */
   this.Delete = function(placeholder) {
     placeholder = placeholder || null;
@@ -213,7 +219,7 @@ var Builder = function() {
   /**
    *
    * @param placeholders
-   * @returns {Graph}
+   * @returns {Builder}
    */
   this.With = function(placeholders) {
     if (Array.isArray(placeholders) && placeholders.length !== 0) {
@@ -228,8 +234,7 @@ var Builder = function() {
    *
    * @param placeholder
    * @param parameter
-   * @returns {Graph}
-   * @constructor
+   * @returns {Builder}
    */
   this.Set = function(placeholder, parameter) {
     if (placeholder && placeholder !== '') {
@@ -246,8 +251,7 @@ var Builder = function() {
    *
    * @param string
    * @param parameter
-   * @returns {Graph}
-   * @constructor
+   * @returns {Builder}
    */
   this.Where = function(string, parameter) {
     string = string || null;
@@ -266,8 +270,7 @@ var Builder = function() {
    *
    * @param list
    * @param query
-   * @returns {Graph}
-   * @constructor
+   * @returns {Builder}
    */
   this.ForeachArray = function(list, query) {
     list = list || null;
@@ -286,8 +289,7 @@ var Builder = function() {
    *
    * @param condition
    * @param query
-   * @returns {Graph}
-   * @constructor
+   * @returns {Builder}
    */
   this.ForeachCondition = function(condition, query) {
     condition = condition || null;
@@ -305,7 +307,7 @@ var Builder = function() {
    *
    * @param idName
    * @param additionalPlaceholders
-   * @returns {Graph}
+   * @returns {Builder}
    */
   this.createUniqueId = function(idName, additionalPlaceholders) {
     if (!Array.isArray(additionalPlaceholders) || additionalPlaceholders.length == 0)
@@ -318,19 +320,9 @@ var Builder = function() {
     return this;
   };
 
-
   /**
    *
-   * @param obj
-   * @param callback
-   */
-  this.delete = function(obj, callback) {
-    connection.delete(obj, callback);
-  };
-
-  /**
-   *
-   * @returns {Graph}
+   * @returns {Builder}
    */
   this.reset = function() {
     QueryPlaceholders = [];
@@ -393,5 +385,18 @@ var Builder = function() {
 
     return string;
   }
-
 };
+
+/**
+ *
+ * @returns {Builder}
+ */
+Builder.singleton = function() {
+  if (_.isNull(_instance) === true) {
+    _instance = new Builder();
+  }
+
+  return _instance;
+};
+
+module.exports = Builder;

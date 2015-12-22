@@ -1,15 +1,12 @@
 "use strict";
 
 var _ = require('underscore')
-  , _builderInstance = null
+  , Builder = require('./Builder')
   , _graphInstance = null;
 
 
 var Graph = function() {
-  var queries = []
-    , connection = null
-    , QueryPlaceholders = []
-    , parameters = {}
+  var connection = null
     , cachedQuery = '';
 
   /**
@@ -26,6 +23,7 @@ var Graph = function() {
     return this;
   };
 
+
   /**
    *
    * @param query
@@ -33,7 +31,7 @@ var Graph = function() {
    * @param callback
    */
   this.Query = function(query, parameters, callback) {
-    query = query || null;
+    query = query || null;
 
     if (query && typeof query === 'string') {
       connection.query(query, parameters, function(err, result) {
@@ -42,28 +40,15 @@ var Graph = function() {
     }
   };
 
-  /**
-   *
-   * @param placeholder
-   * @returns {Graph}
-   */
-  this.addQueryPlaceholder = function(placeholder) {
-    placeholder = placeholder || null;
 
-    if (!_.isNull(placeholder)) {
-      QueryPlaceholders.push(placeholder);
-    }
-
-    return this;
-  };
 
   /**
    *
-   * @param placeholders
+   * @param builder
    * @param cached
    * @param callback
    */
-  this.run = function(placeholders, cached, callback) {
+  this.run = function(builder, cached, callback) {
     if (typeof cached === 'function') {
       callback = cached;
       cached = false;
@@ -72,26 +57,20 @@ var Graph = function() {
     var me = this
       , query = "";
 
-    if (_.isNull(_builderInstance)) {
-      callback({error: {message: "Builder was not used before execution.", code: 10100}});
+    if (cached === false) {
+      // Concat all queries.
+      query = builder.getQuery();
+      cachedQuery = query;
     } else {
-      if (cached === false) {
-        cachedQuery = Builder.getQuery(placeholders);
-      }
-
       query = cachedQuery;
-
-      if (query === "") {
-        callback({error: {message: "No query to execute.", code: 10101}});
-      } else {
-        // Query the database.
-        me.Query(query, parameters, function(err, result) {
-          query = null;
-          callback(err, result);
-        });
-      }
     }
 
+    // Query the database.
+    me.Query(query, builder.getParameters(), function(err, result) {
+      query = null;
+      builder.reset();
+      callback(err, result);
+    });
   };
 };
 
@@ -117,12 +96,8 @@ Graph.singleton = function(connection) {
  * @constructor
  */
 Graph.Builder = function() {
-  if (_.isNull(_builderInstance)) {
-    var Builder = require('Builder');
-    _builderInstance = new Builder();
-  }
 
-  return _builderInstance;
+  return Builder.singleton().reset();
 };
 
 module.exports = Graph;
