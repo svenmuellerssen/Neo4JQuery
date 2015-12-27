@@ -2,14 +2,14 @@
 Tool that handles cypher syntax as method calls
 
 # What is Neo4jQuery?
-Neo4jQuery is a simple implementation based on the cypher query language used in the graph database system Neo4J. 
+Neo4jQuery is a simple implementation to use the query language 'Cypher' made for the graph database system ˙Neo4J˙. 
 
 #Why Neo4jQuery
-I implemented this wrapper class for the Neo4J query language because seraph can not perform a delete of a node and/or relationship in NodeJS with cypher.
+˙Neo4JQuery˙ is made only to work with the database via the query language ˙Cypher˙ while other modules handle with node or relationship objects.
 
-It is nice too that the Cypher query can be split by just method calls and not by concatenating a query string.
+To create a cypher query you have a lot of methods available in a builder object. You can chain all these methods so it looks like a real cypher command.
 
-All methods except 'Query' return the wrapper class itself so you can chain your method calls.
+The builder object is part of the method signature of the ˙Neo4JQuery˙ command ˙run˙ which executes the cypher query in the end. 
 
 # How to use
 1. Download repository into a library folder (later it should be a npm module).
@@ -18,6 +18,7 @@ All methods except 'Query' return the wrapper class itself so you can chain your
 4. Import both, seraph and Neo4jQuery, with 'require' and connect to your Neo4J graph database.
 5. You can write your own module to wrap the methods of Neo4JQuery and import your own small module.
 
+__DEPRECATED__
 __Quick example__
 ```javascript
 var seraph = require("seraph")({
