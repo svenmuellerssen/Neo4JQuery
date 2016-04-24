@@ -20,6 +20,7 @@ var Graph = function() {
     if (!_.isNull(connection) && !_.isUndefined(connection)) {
       console.log('Connected to database "Neo4J".');
     }
+
     return this;
   };
 
@@ -47,6 +48,7 @@ var Graph = function() {
    * @param builder
    * @param cached
    * @param callback
+   * @todo Implement the feature to specify returned nodes and relations!!
    */
   this.run = function(builder, cached, callback) {
     if (typeof cached === 'function') {
@@ -72,6 +74,46 @@ var Graph = function() {
       callback(err, result);
     });
   };
+
+  /**
+   *
+   * @param options {Object}
+   * @todo Implement the feature to specify returned nodes and relations!!
+   */
+  this.run2 = function(options) {
+    // Without a builder it makes no sense to query the database.
+    if (!options.builder) return false;
+    // Default settings
+    if (!options.success) options.success = function(result) {};
+    if (!options.error) options.error = function(err) {};
+    if (_.isUndefined(options.cache) || _.isNull(options.cache)) options.cached = false;
+    if (!options.returned || !Array.isArray(returned) || returned.length == 0) options.returned = [];
+
+    var me = this
+      , query = "";
+
+    if (options.cached === false) {
+      // Concat all queries.
+      query = options.builder.getQuery(options.returned);
+      cachedQuery = query;
+    } else {
+      query = cachedQuery;
+    }
+
+    // Query the database.
+    me.Query(query, options.builder.getParameters(), function(err, result) {
+      query = null;
+      options.builder.reset();
+      if (!err) options.success(result);
+      else {
+        options.error(err);
+      }
+    });
+  };
+
+  this.Builder = function() {
+    return Builder.singleton().reset();
+  };
 };
 
 /**
@@ -88,16 +130,6 @@ Graph.singleton = function(connection) {
   }
 
   return _graphInstance;
-};
-
-/**
- *
- * @returns {*}
- * @constructor
- */
-Graph.Builder = function() {
-
-  return Builder.singleton().reset();
 };
 
 module.exports = Graph;

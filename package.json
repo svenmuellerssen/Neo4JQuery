@@ -1,0 +1,24 @@
+{
+  "name": "Neo4JQuery",
+  "version": "0.1.0",
+  "description": "Library to make Cypher easy to use with method chaining.",
+  "homepage": "http://www.neo4jquery.org",
+    "keywords": [
+    "util",
+    "database",
+    "neo4j",
+    "graph"
+    ],
+  "author": {
+    "name": "Sven Mueller",
+    "email": "sven.mueller@localdomain.org"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/svenmuellerssen/Neo4jQuery.git"
+  },
+  "main": "index.php",
+  "dependencies": {
+    "underscore": "1.6.0"
+  }
+}
