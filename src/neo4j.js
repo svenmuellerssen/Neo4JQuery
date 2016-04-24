@@ -81,13 +81,14 @@ var Graph = function() {
    * @todo Implement the feature to specify returned nodes and relations!!
    */
   this.run2 = function(options) {
+
     // Without a builder it makes no sense to query the database.
     if (!options.builder) return false;
     // Default settings
     if (!options.success) options.success = function(result) {};
     if (!options.error) options.error = function(err) {};
-    if (_.isUndefined(options.cache) || _.isNull(options.cache)) options.cached = false;
-    if (!options.returned || !Array.isArray(returned) || returned.length == 0) options.returned = [];
+    if (_.isUndefined(options.cached) || _.isNull(options.cached)) options.cached = false;
+    if (!options.returned || !Array.isArray(options.returned) || options.returned.length == 0) options.returned = [];
 
     var me = this
       , query = "";

@@ -43,9 +43,10 @@ var Builder = function() {
       // Get the placeholders for return them.
       if (_.isNull(returned) && Array.isArray(QueryPlaceholders) && QueryPlaceholders.length > 0) {
         // Return placeholders.
-        query = query + ' RETURN ' + QueryPlaceholders.join(', ');
+        query += ' RETURN ' + QueryPlaceholders.join(', ');
       } else {
-        query += query + ' RETURN ' + returned.join(', ');
+        returned = _.unique(returned);
+        query += ' RETURN ' + returned.join(', ');
       }
     }
 
@@ -89,7 +90,7 @@ var Builder = function() {
     	query = 'MATCH ';
 	  }
 
-    query += getNodeQuery(placeholder, label, parameter);
+    query += this.getNodeQuery(placeholder, label, parameter);
     queries.push(query);
 
     QueryPlaceholders.push(placeholder);
@@ -106,7 +107,7 @@ var Builder = function() {
    * @constructor
    */
   this.AddMatch = function(placeholder, label, parameter) {
-    queries.push(getNodeQuery(placeholder, label, parameter));
+    queries.push(this.getNodeQuery(placeholder, label, parameter));
     QueryPlaceholders.push(placeholder);
     return this;
   };
@@ -192,7 +193,7 @@ var Builder = function() {
     }
 
     var query = 'MERGE ';
-    query += getNodeQuery(placeholder, label, parameter);
+    query += this.getNodeQuery(placeholder, label, parameter);
 
     queries.push(query);
     QueryPlaceholders.push(placeholder);
@@ -207,7 +208,7 @@ var Builder = function() {
    * @param parameter
    * @returns {string}
    */
-  var getNodeQuery = function(placeholder, label, parameter) {
+  this.getNodeQuery = function(placeholder, label, parameter) {
     placeholder = placeholder || null;
     parameter = parameter || {};
     label = label || '';
@@ -472,7 +473,7 @@ var Builder = function() {
         queries.push(queryPart);
       return this;
     }
-  }
+  };
 
   this.AggregateReadWrite = function(placeholder, readWriter, aggregateFunc) {
       if (typeof placeholder === 'string') {
@@ -514,7 +515,7 @@ var Builder = function() {
           }
       }
     return this;
-  }
+  };
 
   this.AggregateReturn = function(placeholder, aggregateFunc) {
       if (typeof placeholder === 'string') {
