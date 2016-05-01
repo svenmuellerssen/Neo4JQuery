@@ -38,7 +38,7 @@ var Builder = function() {
 
     if (me.hasQueries()) {
       // Concat all queries.
-      query = queries.join('\n');
+      query = queries.join('');
 
       // Get the placeholders for return them.
       if (_.isNull(returned) && Array.isArray(QueryPlaceholders) && QueryPlaceholders.length > 0) {
@@ -85,9 +85,9 @@ var Builder = function() {
     var query = '';
 
     if (optional === true) {
-        query = 'OPTIONAL MATCH ';
+        query = ' OPTIONAL MATCH ';
     } else {
-    	query = 'MATCH ';
+    	query = ' MATCH ';
 	  }
 
     query += this.getNodeQuery(placeholder, label, parameter);
@@ -98,6 +98,9 @@ var Builder = function() {
     return this;
   };
 
+  this.OptionalMatch = function(placeholder, label, parameter) {
+    return this.Match(placeholder, label, true, parameter);
+  };
   /**
    *
    * @param placeholder
@@ -192,7 +195,7 @@ var Builder = function() {
       placeholder = 't';
     }
 
-    var query = 'MERGE ';
+    var query = ' MERGE ';
     query += this.getNodeQuery(placeholder, label, parameter);
 
     queries.push(query);
@@ -227,16 +230,16 @@ var Builder = function() {
     query += '(' + placeholder + label;
 
     if (parameter && !_.isEmpty(parameter))
-      query += ' ' + me.prepareParameter(':', parameter) + ') ';
+      query += ' ' + me.prepareParameter(':', parameter) + ')';
     else
-      query += ') ';
+      query += ')';
 
     return query;
   };
 
-  var getRelationQuery = function() {
-
-  };
+//  var getRelationQuery = function() {
+//
+//  };
 
   /**
    *
@@ -268,7 +271,7 @@ var Builder = function() {
         placeholder = 'r'
       }
 
-      var string = 'MERGE (' + nodes[0] + ')-' + '[' + placeholder;
+      var string = ' MERGE (' + nodes[0] + ')-' + '[' + placeholder;
       if (label !== '') {
         string += ':' + label + ' ';
       }
@@ -292,7 +295,7 @@ var Builder = function() {
     var string = '';
 
     if (!_.isNull(condUpdate))
-      string = 'ON CREATE ' + condUpdate;
+      string = ' ON CREATE ' + condUpdate;
 
     if (string !== '')
       queries.push(string);
@@ -310,7 +313,7 @@ var Builder = function() {
     var string = '';
 
     if (!_.isNull(condUpdate))
-      string = 'ON MATCH ' + condUpdate;
+      string = ' ON MATCH ' + condUpdate;
 
     if (string !== '')
       queries.push(string);
@@ -329,9 +332,9 @@ var Builder = function() {
     if (!_.isNull(placeholder)) {
       var string = '';
       if (typeof placeholder === 'string') {
-        string += 'DELETE ' + placeholder;
+        string += ' DELETE ' + placeholder;
       } else if (Array.isArray(placeholder) && placeholder.length > 0) {
-        string += 'DELETE ' + placeholder.join(', ');
+        string += ' DELETE ' + placeholder.join(', ');
       }
 
       if (string !== '') {
@@ -349,7 +352,7 @@ var Builder = function() {
    */
   this.With = function(placeholders) {
     if (Array.isArray(placeholders) && placeholders.length !== 0) {
-      var string = 'WITH ' + placeholders.join(', ');
+      var string = ' WITH ' + placeholders.join(', ');
       queries.push(string);
     }
 
@@ -365,7 +368,7 @@ var Builder = function() {
   this.Set = function(placeholder, parameter) {
     if (placeholder && placeholder !== '') {
       var me = this
-        , string = 'SET ' + me.prepareParameter(placeholder + '.', parameter);
+        , string = ' SET ' + me.prepareParameter(placeholder + '.', parameter);
 
       queries.push(string);
     }
@@ -384,7 +387,7 @@ var Builder = function() {
     parameter = parameter || null;
 
     if (!_.isNull(string) && typeof string === 'string')
-      queries.push('WHERE ' + string);
+      queries.push(' WHERE ' + string);
 
     if (!_.isNull(parameter))
       parameters = _.extend(parameters, parameter);
@@ -403,7 +406,7 @@ var Builder = function() {
     query = query || null;
 
     if (!_.isNull(query) && Array.isArray(list) && list.length > 0) {
-      var string = 'FOREACH (item in {items} | \n' + query + ')';
+      var string = ' FOREACH (item in {items} | \n' + query + ')';
       queries.push(string);
       parameters = {items: list};
     }
@@ -422,7 +425,7 @@ var Builder = function() {
     query = query || null;
 
     if (!_.isNull(query) && typeof condition === 'string') {
-      var string = 'FOREACH (' + condition + ' | \n' + query + ')';
+      var string = ' FOREACH (' + condition + ' | \n' + query + ')';
       queries.push(string);
     }
 
@@ -450,19 +453,19 @@ var Builder = function() {
       var queryPart = '';
       switch(reader) {
         case this.MATCH:
-            queryPart = 'MATCH ' + placeholder.map(function(val){
+            queryPart = ' MATCH ' + placeholder.map(function(val){
                 "use strict";
                 return glueForAggregation(this.MATCH, val) + ', ';
             });
           break;
         case this.OPTIONAL_MATCH:
-            queryPart = 'MATCH OPTIONAL' + placeholder.map(function(val){
+            queryPart = ' MATCH OPTIONAL' + placeholder.map(function(val){
                 "use strict";
                 return glueForAggregation(this.OPTIONAL_MATCH, val) + ', ';
             });
           break;
         case this.START:
-            queryPart = 'START ' + placeholder.map(function(val){
+            queryPart = ' START ' + placeholder.map(function(val){
                 "use strict";
                 return glueForAggregation(this.START, val) + ', ';
             });
@@ -475,6 +478,14 @@ var Builder = function() {
     }
   };
 
+  /**
+   *
+   * @param placeholder
+   * @param readWriter
+   * @param aggregateFunc
+   * @returns {Builder}
+   * @constructor
+   */
   this.AggregateReadWrite = function(placeholder, readWriter, aggregateFunc) {
       if (typeof placeholder === 'string') {
           placeholder = [placeholder];
@@ -487,25 +498,25 @@ var Builder = function() {
         var queryPart = '';
           switch(readWriter) {
               case this.CREATE:
-                  queryPart = 'CREATE ' + placeholder.map(function(val){
+                  queryPart = ' CREATE ' + placeholder.map(function(val){
                           "use strict";
                           return glueForAggregation(this.CREATE, val) + ', ';
                       });
                   break;
               case this.CREATE_UNIQUE:
-                  queryPart = 'CREATE UNIQUE ' + placeholder.map(function(val){
+                  queryPart = ' CREATE UNIQUE ' + placeholder.map(function(val){
                           "use strict";
                           return glueForAggregation(this.CREATE_UNIQUE, val) + ', ';
                       });
                   break;
               case this.MERGE:
-                  queryPart = 'MERGE ' + placeholder.map(function(val){
+                  queryPart = ' MERGE ' + placeholder.map(function(val){
                           "use strict";
                           return glueForAggregation(this.MERGE, val) + ', ';
                       });
                   break;
               case this.DELETE:
-                  queryPart = 'DELETE ' + placeholder.map(function(val){
+                  queryPart = ' DELETE ' + placeholder.map(function(val){
                           "use strict";
                           return glueForAggregation(this.DELETE, val) + ', ';
                       });
@@ -517,6 +528,13 @@ var Builder = function() {
     return this;
   };
 
+  /**
+   *
+   * @param placeholder
+   * @param aggregateFunc
+   * @returns {Builder}
+   * @constructor
+   */
   this.AggregateReturn = function(placeholder, aggregateFunc) {
       if (typeof placeholder === 'string') {
           placeholder = [placeholder];
@@ -532,7 +550,7 @@ var Builder = function() {
       }
 
     return this;
-  }
+  };
 
   /**
    *
@@ -546,7 +564,7 @@ var Builder = function() {
     else
       additionalPlaceholders.unshift(idName);
 
-    queries.push("MERGE (id:UniqueId{}) ON CREATE SET id.count = 1 ON MATCH SET id.count = id.count + 1 WITH id.count AS " + additionalPlaceholders.join(', ') + " ");
+    queries.push(" MERGE (id:UniqueId{}) ON CREATE SET id.count = 1 ON MATCH SET id.count = id.count + 1 WITH id.count AS " + additionalPlaceholders.join(', ') + " ");
     uniqueIds.push(idName);
     return this;
   };
@@ -615,7 +633,7 @@ var Builder = function() {
     if (separator === ':') string += '}';
 
     return string;
-  }
+  };
 
     /**
      *
@@ -624,7 +642,7 @@ var Builder = function() {
      */
   var isReader = function(reader) {
       reader = reader || 0;
-      if (isNAN(parseInt(reader)))
+      if (typeof parseInt(reader) !== 'number')
         return false;
         
       switch(reader) {
@@ -637,7 +655,7 @@ var Builder = function() {
             return false;
           break;
       }
-  }
+  };
 
     /**
      *
@@ -646,21 +664,22 @@ var Builder = function() {
      */
   var isReadWriter = function(readWriter) {
     readWriter = readWriter || 0;
-    if (isNAN(parseInt(readWriter))) {
+    if (typeof parseInt(readWriter) !== 'number') {
       return false;
     }
 
+    var me = this;
     switch(readWriter) {
-      case this.CREATE:
-        case this.MERGE:
-      case this.CREATE_UNIQUE:
-      case this.DELETE:
+      case me.CREATE:
+      case me.MERGE:
+      case me.CREATE_UNIQUE:
+      case me.DELETE:
         return true;
         break;
       default:
         return false;
     }
-  }
+  };
 
     /**
      *
@@ -670,16 +689,17 @@ var Builder = function() {
   var isAggregateFunc = function (func) {
     if (isNAN(parseInt(func)))
       return false;
-      
+
+    var me = this;
     switch(func) {
-      case this.AGGREGATE_COUNT:
-      case this.AGGREGATE_SUM:
-      case this.AGGREGATE_AVG:
-      case this.AGGREGATE_MIN:
-      case this.AGGREGATE_MAX:
-      case this.AGGREGATE_COLLECT:
-      case this.AGGREGATE_FILTER:
-      case this.AGGREGATE_EXTRACT:
+      case me.AGGREGATE_COUNT:
+      case me.AGGREGATE_SUM:
+      case me.AGGREGATE_AVG:
+      case me.AGGREGATE_MIN:
+      case me.AGGREGATE_MAX:
+      case me.AGGREGATE_COLLECT:
+      case me.AGGREGATE_FILTER:
+      case me.AGGREGATE_EXTRACT:
         return true;
       default:
         return false;
@@ -694,38 +714,39 @@ var Builder = function() {
    */
   var glueForAggregation = function(func, placeholder) {
         "use strict";
-        if (isAggregateFunc(func)) {
-            switch(func) {
-                case this.AGGREGATE_COUNT:
-                    return 'count(' + placeholder + ')';
-                    break;
-                case this.AGGREGATE_SUM:
-                    return 'sum(' + placeholder + ')';
-                    break;
-                case this.AGGREGATE_AVG:
-                    return 'avg(' + placeholder + ')';
-                    break;
-                case this.AGGREGATE_MIN:
-                    return 'min(' + placeholder + ')';
-                    break;
-                case this.AGGREGATE_MAX:
-                    return 'max(' + placeholder + ')';
-                    break;
-                case this.AGGREGATE_COLLECT:
-                    return 'collect(' + placeholder + ')';
-                    break;
-                case this.AGGREGATE_FILTER:
-                    return 'filter(' + placeholder + ')';
-                    break;
-                case this.AGGREGATE_EXTRACT:
-                    return 'extract(' + placeholder + ')';
-                    break;
-                default:
-                    break;
-            }
+    var me = this;
+      if (isAggregateFunc(func)) {
+        switch(func) {
+          case me.AGGREGATE_COUNT:
+            return 'count(' + placeholder + ')';
+            break;
+          case me.AGGREGATE_SUM:
+            return 'sum(' + placeholder + ')';
+            break;
+          case me.AGGREGATE_AVG:
+            return 'avg(' + placeholder + ')';
+            break;
+          case me.AGGREGATE_MIN:
+            return 'min(' + placeholder + ')';
+            break;
+          case me.AGGREGATE_MAX:
+            return 'max(' + placeholder + ')';
+            break;
+          case me.AGGREGATE_COLLECT:
+            return 'collect(' + placeholder + ')';
+            break;
+          case me.AGGREGATE_FILTER:
+            return 'filter(' + placeholder + ')';
+            break;
+          case me.AGGREGATE_EXTRACT:
+            return 'extract(' + placeholder + ')';
+            break;
+          default:
+            break;
         }
+      }
     }
-};
+  };
 
 /**
  *

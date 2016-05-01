@@ -105,9 +105,10 @@ var Graph = function() {
     me.Query(query, options.builder.getParameters(), function(err, result) {
       query = null;
       options.builder.reset();
-      if (!err) options.success(result);
-      else {
+      if (err) {
         options.error(err);
+      } else {
+        options.success(result);
       }
     });
   };
