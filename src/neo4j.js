@@ -1,6 +1,7 @@
 "use strict";
 
 var _ = require('underscore')
+  , async = require('async')
   , Builder = require('./Builder')
   , _graphInstance = null;
 
@@ -88,7 +89,7 @@ var Graph = function() {
     if (!options.success) options.success = function(result) {};
     if (!options.error) options.error = function(err) {};
     if (_.isUndefined(options.cached) || _.isNull(options.cached)) options.cached = false;
-    if (!options.returned || !Array.isArray(options.returned) || options.returned.length == 0) options.returned = [];
+    if (!options.returned || _.isEmpty(options.returned)) options.returned = {};
 
     var me = this
       , query = "";
@@ -101,6 +102,44 @@ var Graph = function() {
       query = cachedQuery;
     }
 
+    /**
+     *
+     * @param aliases
+     * @param result
+     * @param callback
+     */
+    var buildAliases = function(aliases, result, callback) {
+      if (!Array.isArray(result) || result.length === 0 || _.isEmpty(aliases)) {
+        callback(null, result);
+      } else {
+        var placeholder = _.keys(aliases);
+        // Map over every result item properties to set values to aliases.
+        async.mapLimit(
+          result,
+          1000,
+          function iterator(item, immediateCallback) {
+            // Loop over the placeholders to be return to replace them with aliases.
+            async.eachLimit(
+              placeholder,
+              100,
+              function aliasIterator(placeholder, innerImmediateCallback) {
+                if (!_.isUndefined(item[placeholder])) {
+                  item[aliases[placeholder]] = item[placeholder];
+                  delete item[placeholder];
+                }
+
+                innerImmediateCallback(null);
+              },
+              function eachCallback(err) {
+                immediateCallback(err, item);
+              });
+          },
+          function mapCallback(err, aliasResult) {
+            callback(err, aliasResult);
+          });
+      }
+    };
+
     // Query the database.
     me.Query(query, options.builder.getParameters(), function(err, result) {
       query = null;
@@ -108,7 +147,10 @@ var Graph = function() {
       if (err) {
         options.error(err);
       } else {
-        options.success(result);
+        buildAliases(options.returned, result, function(err, newResult) {
+          if (err) options.error(err);
+          else options.success(newResult);
+        });
       }
     });
   };

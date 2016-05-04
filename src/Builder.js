@@ -33,7 +33,8 @@ var Builder = function() {
    * @todo Implement 'returned' with aliases!!
    */
   this.getQuery = function(returned) {
-    returned = (Array.isArray(returned) && returned.length > 0) ? returned : null;
+    returned = (returned && !_.isEmpty(returned)) ? _.keys(returned) : [];
+
     var me = this
       , query = "";
 
@@ -41,11 +42,12 @@ var Builder = function() {
       // Concat all queries.
       query = queries.join('');
 
-      // Get the placeholders for return them.
-      if (_.isNull(returned) && Array.isArray(QueryPlaceholders) && QueryPlaceholders.length > 0) {
+      // Get the placeholders for return them...
+      if (returned.length == 0 && Array.isArray(QueryPlaceholders) && QueryPlaceholders.length > 0) {
         // Return placeholders.
         query += ' RETURN ' + QueryPlaceholders.join(', ');
       } else {
+        // ... or have given placeholder to return.
         returned = _.unique(returned);
         query += ' RETURN ' + returned.join(', ');
       }
