@@ -30,6 +30,7 @@ var Builder = function() {
   /**
    *
    * @returns {string}
+   * @todo Implement 'returned' with aliases!!
    */
   this.getQuery = function(returned) {
     returned = (Array.isArray(returned) && returned.length > 0) ? returned : null;
