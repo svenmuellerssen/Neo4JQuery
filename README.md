@@ -1,71 +1,57 @@
 # Neo4jQuery
-Tool that handles cypher syntax as method calls
+Tool that handles cypher syntax as method calls.
 
 # What is Neo4jQuery?
-Neo4jQuery is a simple implementation to use the query language 'Cypher' made for the graph database system ˙Neo4J˙. 
+˙Neo4JQuery˙ is an implementation made to to use the query language 'Cypher' of the graph database ˙Neo4J˙ only.
 
 #Why Neo4jQuery
-˙Neo4JQuery˙ is made only to work with the database via the query language ˙Cypher˙ while other modules handle with node or relationship objects.
+The library provides the strength of Cypher to use batch functionality
+like multiple matches and merges and creating relationships in one query.
 
-To create a cypher query you have a lot of methods available in a builder object. You can chain all these methods so it looks like a real cypher command.
+It is also made to be more like programming a Cypher query than have lots of Cypher strings in the code which
+ could be confusing.
 
-The builder object is part of the method signature of the ˙Neo4JQuery˙ command ˙run˙ which executes the cypher query in the end. 
+Therefor you have lots of methods available in the query builder object which can be chained and
+is looking like a real cypher command in the end.
 
 # How to use
 1. Download repository into a library folder (later it should be a npm module).
 2. Install the module `underscore` via __npm install underscore__.
-3. Install the module `seraph` via __npm install seraph__.
-4. Import both, seraph and Neo4jQuery, with 'require' and connect to your Neo4J graph database.
-5. You can write your own module to wrap the methods of Neo4JQuery and import your own small module.
+3. Install the driver module like `seraph` via __npm install seraph__.
+4. Import both, `seraph` and `Neo4jQuery`, with 'require' and connect to your Neo4J graph database.
 
 __DEPRECATED__
-__Quick example__
+__Quick example to get connection__
 ```javascript
 var seraph = require("seraph")({
-	"http://localhost:7474",
-  	user: configurationParams.app.db.user,
-  	pass: configurationParams.app.db.pass
-    })
-    , graph = require(<path to Neo4jQuery>).singleton(seraph);
+      server: "http://127.0.0.1:7474",
+      endpoint: "/data/graph.db"",
+      user: "testuser",
+      pass: "testpass"
+      })
+  , graph = require("neo4jquery").setConnection(seraph);
 
 ```
 
 #Documentation
 <a name="setConnection" />
 ### setConnection(connection)
-Sets a driver which is connected to a Neo4j database. The only requirement is that the driver implements a method called 'query'.
+Sets a driver which is connected to a Neo4J database.
+The only requirement is that the driver implements a method called 'query'.
 
 __Arguments__
 
-* `connection` (object) - A driver with a connection to a Neo4j database
+* `connection` (object) - A driver with a connection to a Neo4J database
 
 __Example__
 
 ```javascript
-var graph = require(<path to Neo4JQuery>).singleton()
-
-    graph.setConnection(<driver object>);
-```
-<a name="reset" />
-### reset()
-Resets the complete graph object except connection.
-
-__Arguments__
-
-
-__Example__
-
-```javascript
-var graph = require(<path to Neo4JQuery>).singleton()
-    , query = "MATCH (n:Node) WHERE n.field1=? AND r.field2=? RETURN n"
-    , parameters = ["value1", "value2"]
-
-    graph.reset();
+var graph = require("neo4jquery").setConnection(<driver object>);
 ```
 
 <a name="query" />
 ### Query(query, parameters, callback)
-Executes a given query directly. Using parameters for parameterized cypher queries.
+Executes a passed-in query directly. Using parameters for parameterized cypher queries.
 
 __Arguments__
 
@@ -76,47 +62,183 @@ __Arguments__
 __Example__
 
 ```javascript
-var graph = require(<path to Neo4JQuery>).singleton()
-    , query = "MATCH (n:Node) WHERE n.field1=? AND r.field2=? RETURN n"
-    , parameters = ["value1", "value2"]
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , query = "MATCH (n:Node) WHERE n.field1=? AND r.field2=? RETURN n"
+  , parameters = ["value1", "value2"]
 
-    graph
+  graph.Query(query, parameters, function(err, list) {
+      if (err || void 0 === list) {
+        callback(err, void 0);
+      } else {
+        // some stuff here with list
+        var user = list[0];
+      }
+    });
+```
+
+<a name="builder" />
+### Builder()
+Get the Cypher builder object.
+
+__Arguments__
+
+* No arguments
+
+__Example__
+
+```javascript
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , builder = graph.Builder();
+
+```
+
+<a name="run" />
+### run(builder, cached, callback)
+
+Sets conditions to find specific nodes or relationships.
+
+__Arguments__
+
+* `builder` (Builder) - Cypher query builder object.
+* `cached` (bool) - Flag to use the last cypher query.
+* `callback` (function) - The callback function. Parameter of this function are first an error object and second an array as resultset.
+
+__Example__
+
+```javascript
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , builder = graph.Builder();
+
+  builder
+    .reset()
+    .Match('n', 'User')
+    .Where("n.username={username} and n.password={password}", {username: "testuser", password: "testpass"})
+
+  graph.run(builder, false, function(err, list) {
+    if (err || void 0 === list) {
+      callback(err, void 0);
+    } else {
+      // some stuff here with list
+      var user = list[0];
+    }
+  });
+```
+
+<a name="execute" />
+### execute(options)
+
+Executes the query and returns result set.
+
+__Arguments__
+
+* `options` (Object) - An config object with needed settings.
+** `builder` (Builder) - The Cypher query builder you created the query with.
+** `cached` (boolean) - Flag set to false for default. Set to true Neo4JQuery will use the last cached query for execution.
+** `aliases` (Object) - Setting with aliases for the returned result placeholder
+** `success` (function) - Callback function used if query was successful.
+** `error` (function) - Callback function used if query was unsuccessful.
+
+__Example__
+
+```javascript
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , builder = graph.Builder();
+
+    builder
       .reset()
-      .Query(query, parameters, function(err, list) {
-        if (err || void 0 === list) {
-          callback(err, void 0);
-        } else {
-          // some stuff here with list
-          var user = list[0];
-        }
-      });
+      .Match('u', 'User', {username: "testuser", password: "testpass"});
+
+    graph.execute({
+      builder: builder,
+      cached: false,
+      aliases: {
+        u: 'user'
+      },
+      success: function(results) {...},
+      error: function(err) {...}
+    });
+```
+
+<a name="reset" />
+### reset()
+Resets the builder object (inclusive cached query). Should be used to be as first method in the chain when you get the builder object.
+
+__Arguments__
+
+* No arguments
+
+__Example__
+
+```javascript
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , builder = graph.Builder();
+
+  builder.reset();
 ```
 
 <a name="match" />
-### Match(placeholder, label, parameters)
+### Match(placeholder, label, optional, parameters)
 Matches data specified through labels and parameters and bound to the placeholder.
 
 __Arguments__
 
 * `placeholder` (string) - The placeholder of the node or relationship.
 * `label` (string) - The labels which are assigned to nodes.
+* `optional` (boolean) - Flag to use 'OPTIONAL MATCH'. Default is `false`.
 * `parameters` (object) - Parameters to filter nodes.
 
 __Example__
 
 ```javascript
-var graph = require(<path to Neo4JQuery>).singleton()
-    graph
-      .reset()
-      .Match('n', 'node', {field1: '...', field2: '...'})
-      .run(['n', ...], function(err, list) {
-        if (err || void 0 === list) {
-          callback(err, void 0);
-        } else {
-          // some stuff here with list
-          var user = list[0];
-        }
-      });
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , builder = graph.Builder();
+
+  builder
+    .reset()
+    .Match('n', 'node', false, {field1: '...', field2: '...'});
+
+  graph.execute({
+    builder: builder,
+    cached: false,
+    aliases: {
+      n: 'node'
+    },
+    success: function(results) {...},
+    error: function(err) {...}
+  });
+```
+
+<a name="optionalmatch" />
+### OptionalMatch(placeholder, label, parameters)
+Matches data specified through labels and parameters and bound to the placeholder.
+If there is no information found the placeholder will be null.
+
+__Arguments__
+
+* `placeholder` (string) - The placeholder of the node or relationship.
+* `label` (string) - The labels which are assigned to nodes.
+* `optional` (boolean) - Flag to use 'OPTIONAL MATCH'. Default is `false`.
+* `parameters` (object) - Parameters to filter nodes.
+
+__Example__
+
+```javascript
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , builder = graph.Builder();
+
+  builder
+    .reset()
+    .OptionalMatch('n', 'node', {field1: '...', field2: '...'});
+
+  graph.execute({
+    builder: builder,
+    cached: false,
+    aliases: {
+      n: 'node'
+    },
+    success: function(results) {...},
+    error: function(err) {...}
+  });
 ```
 
 <a name="merge" />
@@ -132,18 +254,22 @@ __Arguments__
 __Example__
 
 ```javascript
-var graph = require(<path to Neo4JQuery>).singleton()
-    graph
-      .reset()
-      .Merge('n', 'User', {field1: '...', field2: '...', createdAt: 120987654321})
-      .run(['n', ...], function(err, list) {
-        if (err || void 0 === list) {
-          callback(err, void 0);
-        } else {
-          // some stuff here with list
-          var user = list[0];
-        }
-      });
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , builder = graph.Builder();
+
+  builder
+    .reset()
+    .Merge('u', 'User', {field1: '...', field2: '...', createdAt: 120987654321});
+
+  graph.execute({
+    builder: builder,
+    cached: false,
+    aliases: {
+      u: 'user'
+    },
+    success: function(results) {...},
+    error: function(err) {...}
+  });
 ```
 
 <a name="mergerelationship" />
@@ -163,28 +289,34 @@ __Example__
 ```javascript
 // Here the first value in the nodes array points to the second value 
 // via relationship 'ASSIGNED_WITH_EACH_OTHER'!
-var graph = require(<path to Neo4JQuery>).singleton()
-    graph
-      .reset()
-      .Match('u', 'User', {field1: ..., field2: ...})
-      .With(['u'])
-      .Merge('n', 'Node', {field1: '...', field2: '...', createdAt: 120987654321})
-      .With(['u', 'n'])
-      .MergeRelationShip(['n', 'u'], 'r', 'ASSIGNED_WITH_EACH_OTHER', {field1: '...', field2: '...'})
-      .run(['n', 'u', ...], function(err, list) {
-        if (err || void 0 === list) {
-          callback(err, void 0);
-        } else {
-          // some stuff here with list
-          var user = list[0];
-        }
-      });
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , builder = graph.Builder();
+
+  builder
+    .reset()
+    .Match('u', 'User', false, {field1: ..., field2: ...})
+    .With(['u'])
+    .Merge('n', 'Node', false, {field1: '...', field2: '...', createdAt: 120987654321})
+    .With(['u', 'n'])
+    .MergeRelationShip(['n', 'u'], 'r', 'ASSIGNED_WITH_EACH_OTHER', {field1: '...', field2: '...'});
+
+  graph.execute({
+    builder: builder,
+    cached: false,
+    aliases: {
+      u: 'user',
+      n: 'node',
+      r: 'relation'
+    },
+    success: function(results) {...},
+    error: function(err) {...}
+  });
 ```
 
 <a name="delete" />
 ### Delete(placeholder)
-Try to delete all the given nodes/relationships.
-__Please do not use this method. Not stable!__
+Deletes all the given nodes/relationships.
+Please take care of the order of relationships and nodes you want to remove.
 
 __Arguments__
 
@@ -193,48 +325,22 @@ __Arguments__
 __Example__
 
 ```javascript
-var graph = require(<path to Neo4JQuery>).singleton()
-    graph
-      .reset()
-      .Match('u', 'User', {...})
-      .With(['u'])
-      .Match('u2', 'User', {})
-      .With(['u', 'u2'])
-      .Delete(['u', 'u2', ...])
-      .run([], function(err, list) {
-        if (err || void 0 === list) {
-          callback(err, void 0);
-        } else {
-          // some stuff here with list
-          var user = list[0];
-        }
-      });
-```
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , builder = graph.Builder();
 
-<a name="delete2" />
-### delete(obj, callback)
-Deletes the node object. This overrides the NodeJS driver method and pass-through the parameters.
-At the moment the method awaits a seraph node object but will be adapted to only pass-in a javascript literal object.
+  builder
+    .reset()
+    .Match('u', 'User', {...})
+    .With(['u'])
+    .Match('u2', 'User', {})
+    .With(['u', 'u2'])
+    .Delete(['u', 'u2', ...]);
 
-__Please don't use this function. It is not working properly now.__
-
-__Arguments__
-
-* `obj` (object) - the node object that has to be deleted.
-* `callback` (function) - The callback function for async processing.
-
-__Example__
-
-```javascript
-var graph = require(<path to Neo4JQuery>).singleton()
-    graph
-      .delete({field1: ..., field2: ...}, function(err) {
-        if (err) {
-          callback(err, void 0);
-        } else {
-          // do some stuff here
-        }
-      });
+  graph.execute({
+    builder: builder,
+    success: function(results) {...},
+    error: function(err) {...}
+  });
 ```
 
 <a name="with" />
@@ -249,49 +355,25 @@ __Arguments__
 __Example__
 
 ```javascript
-var graph = require(<path to Neo4JQuery>).singleton()
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , builder = graph.Builder();
 
-    graph
-	.reset()
-	.Match('n', 'User', {username: 'neo4jqueryuser', password: 'password'})
-	.With(['n', ...])
-	.MergeRelationShip(['n', ...], 'r', 'ASSIGNED_WITH_EACH_OTHER', {field1: '...', field2: '...'})
-	.run(['n', ...], function(err, list) {
-	  if (err || void 0 === list) {
-		callback(err, void 0);
-	  } else {
-		// some stuff here with list
-		var user = list[0];
-	  }
-	});
-```
+  builder
+    .reset()
+    .Match('u', 'User', {username: 'neo4jqueryuser', password: 'password'})
+    .With(['u'])
+    .MergeRelationShip(['u'], 'r', 'ASSIGNED_WITH_EACH_OTHER', {field1: '...', field2: '...'});
 
-<a name="set" />
-### Set(placeholder, parameter)
-
-Sets given properties to a node or relationship.
-
-__Arguments__
-
-* `placeholder` (string) - The placeholder of the node or relationship.
-* `parameter` (object) - All parameters to be set as properties in the node or relationship.
-
-__Example__
-
-```javascript
-var graph = require(<path to Neo4JQuery>).singleton()
-    graph
-      .reset()
-      .Match('n', 'User', {username: 'neo4jqueryuser', password: 'password'})
-      .Set('n', {createdAt: 1440360134452, updatedAt: 1440360134452})
-      .run(['n'], function(err, list) {
-        if (err || void 0 === list) {
-          callback(err, void 0);
-        } else {
-          // some stuff here with list
-          var user = list[0];
-        }
-      });
+  graph.execute({
+    builder: builder,
+    cached: false,
+    aliases: {
+      u: 'user',
+      r: 'relation'
+    },
+    success: function(results) {...},
+    error: function(err) {...}
+  });
 ```
 
 <a name="where" />
@@ -307,46 +389,54 @@ __Arguments__
 __Example__
 
 ```javascript
-var graph = require(<path to Neo4JQuery>).singleton()
-    graph
-      .reset()
-      .Match('n', 'User', {username: 'neo4jqueryuser', password: 'password'})
-      .Where("n.username={neo4jqueryuser} and n.password={password}", {neo4jqueryuser: '...', password: '...'})
-      .run(['n'], function(err, list) {
-        if (err || void 0 === list) {
-          callback(err, void 0);
-        } else {
-          // some stuff here with list
-          var user = list[0];
-        }
-      });
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , builder = graph.Builder();
+
+  builder
+    .reset()
+    .Match('u', 'User')
+    .Where("u.username={username} and u.password={password}", {username: 'testuser', password: 'password'});
+
+  graph.execute({
+    builder: builder,
+    cached: false,
+    aliases: {
+      u: 'user'
+    },
+    success: function(results) {...},
+    error: function(err) {...}
+  });
 ```
 
-<a name="run" />
-### run(placeholder, cached, callback)
+<a name="set" />
+### Set(placeholder, parameter)
 
-Sets conditions to find specific nodes or relationships.
+Sets given properties to a node or relationship.
 
 __Arguments__
 
-* `placeholder` (array) - All nodes/relationships that have to be returned.
-* `cached` (bool) - Flag to use the last cypher query.
-* `callback` (function) - The callback function. Parameter of this function are first an error object and second an array as resultset.
+* `placeholder` (string) - The placeholder of the node or relationship.
+* `parameter` (object) - All parameters to be set as properties in the node or relationship.
 
 __Example__
 
 ```javascript
-var graph = require(<path to Neo4JQuery>).singleton()
-    graph
-      .reset()
-      .Match('n', 'User', {username: 'neo4jqueryuser', password: 'password'})
-      .Where("n.username={neo4jqueryuser} and n.password={password}", {neo4jqueryuser: '...', password: '...'})
-      .run(['n'], function(err, list) {
-        if (err || void 0 === list) {
-          callback(err, void 0);
-        } else {
-          // some stuff here with list
-          var user = list[0];
-        }
-      });
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , builder = graph.Builder();
+
+  builder
+    .reset()
+    .Match('u', 'User')
+    .Where("u.username={username} and u.password={password}", {username: 'testuser', password: 'password'})
+    .Set('u', {createdAt: 1440360134452, updatedAt: 1440360134452});
+
+  graph.execute({
+    builder: builder,
+    cached: false,
+    aliases: {
+      u: 'user'
+    },
+    success: function(results) {...},
+    error: function(err) {...}
+  });
 ```
