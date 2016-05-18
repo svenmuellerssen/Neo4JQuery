@@ -25,7 +25,7 @@ __Quick example to get connection__
 ```javascript
 var seraph = require("seraph")({
       server: "http://127.0.0.1:7474",
-      endpoint: "/data/graph.db"",
+      endpoint: "/data/graph.db",
       user: "testuser",
       pass: "testpass"
       })
