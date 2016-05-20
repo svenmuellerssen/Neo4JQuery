@@ -1,6 +1,6 @@
 {
   "name": "neo4jquery",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.1",
   "description": "Module that handles neo4j database cypher syntax as method calls.",
   "main": "index.js",
   "scripts": {
@@ -23,7 +23,7 @@
   ],
   "author": {
     "name": "Sven Mueller",
-    "email":"svenmue@localdomain.org"
+    "email": "svenmue@localdomain.org"
   },
   "license": "LGPL",
   "bugs": {
