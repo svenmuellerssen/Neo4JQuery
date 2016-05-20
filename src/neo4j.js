@@ -81,13 +81,12 @@ var Graph = function() {
    * @param options {Object}
    * @todo Implement the feature to specify returned nodes and relations!!
    */
-  this.run2 = function(options) {
-
-    // Without a builder it makes no sense to query the database.
-    if (!options.builder) return false;
-    // Default settings
+  this.execute = function(options) {
     if (!options.success) options.success = function(result) {};
-    if (!options.error) options.error = function(err) {};
+    if (!options.error) options.error = function(err) {console.log(err);};
+    // Without a builder it makes no sense to query the database.
+    if (!options.builder) options.error({message: 'No Cypher query builder found.', code: 1001}, null);
+    // Default settings
     if (_.isUndefined(options.cached) || _.isNull(options.cached)) options.cached = false;
     if (!options.returned || _.isEmpty(options.returned)) options.returned = {};
 

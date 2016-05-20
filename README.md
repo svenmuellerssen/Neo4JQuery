@@ -20,7 +20,6 @@ is looking like a real cypher command in the end.
 3. Install the driver module like `seraph` via __npm install seraph__.
 4. Import both, `seraph` and `Neo4jQuery`, with 'require' and connect to your Neo4J graph database.
 
-__DEPRECATED__
 __Quick example to get connection__
 ```javascript
 var seraph = require("seraph")({
@@ -33,9 +32,12 @@ var seraph = require("seraph")({
 
 ```
 
-#Documentation
+# Documentation
+
+## Graph
 <a name="setConnection" />
 ### setConnection(connection)
+
 Sets a driver which is connected to a Neo4J database.
 The only requirement is that the driver implements a method called 'query'.
 
@@ -51,6 +53,7 @@ var graph = require("neo4jquery").setConnection(<driver object>);
 
 <a name="query" />
 ### Query(query, parameters, callback)
+
 Executes a passed-in query directly. Using parameters for parameterized cypher queries.
 
 __Arguments__
@@ -63,8 +66,8 @@ __Example__
 
 ```javascript
 var graph = require("neo4jquery").setConnection(<driver object>)
-  , query = "MATCH (n:Node) WHERE n.field1=? AND r.field2=? RETURN n"
-  , parameters = ["value1", "value2"]
+  , query = "MATCH (n:Node {field1: {v1}})-[r1:IS_LABEL]-(n2:Node2 {field2: {v2}}) RETURN n"
+  , parameters = {v1: "value1", v2: "value2"}
 
   graph.Query(query, parameters, function(err, list) {
       if (err || void 0 === list) {
@@ -78,6 +81,7 @@ var graph = require("neo4jquery").setConnection(<driver object>)
 
 <a name="builder" />
 ### Builder()
+
 Get the Cypher builder object.
 
 __Arguments__
@@ -132,11 +136,11 @@ Executes the query and returns result set.
 __Arguments__
 
 * `options` (Object) - An config object with needed settings.
-** `builder` (Builder) - The Cypher query builder you created the query with.
-** `cached` (boolean) - Flag set to false for default. Set to true Neo4JQuery will use the last cached query for execution.
-** `aliases` (Object) - Setting with aliases for the returned result placeholder
-** `success` (function) - Callback function used if query was successful.
-** `error` (function) - Callback function used if query was unsuccessful.
+- `builder` (Builder) - The Cypher query builder you created the query with.
+- `cached` (boolean) - Flag set to false for default. Set to true Neo4JQuery will use the last cached query for execution.
+- `aliases` (Object) - Setting with aliases for the returned result placeholder
+- `success` (function) - Callback function used if query was successful.
+- `error` (function) - Callback function used if query was unsuccessful.
 
 __Example__
 
@@ -159,8 +163,11 @@ var graph = require("neo4jquery").setConnection(<driver object>)
     });
 ```
 
+## Cypher Builder
+
 <a name="reset" />
 ### reset()
+
 Resets the builder object (inclusive cached query). Should be used to be as first method in the chain when you get the builder object.
 
 __Arguments__
@@ -313,6 +320,74 @@ var graph = require("neo4jquery").setConnection(<driver object>)
   });
 ```
 
+<a name="oncreate" />
+### onCreate(command)
+Event used with _Merge_ to be executed if _Merge_ creates a new node/relationship.
+
+
+__Arguments__
+
+* `command` (string) - The command like _SET_ followed by what to do.
+
+__Example__
+
+```javascript
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , builder = graph.Builder();
+
+  builder
+    .reset()
+    .Merge('u', 'User', {field1: ..., field2: ...})
+    .relate('r1', 'GUESSED_RELATIONSHIP')
+    .toNode('n', 'Note', {field3: ..., field4: ...})
+    .onCreate('SET u.createdAt=timestamp(), n.createdAt=timestamp()');
+
+  graph.execute({
+    builder: builder,
+    cached: false,
+    aliases: {
+      u: 'user',
+      n: 'node'
+    },
+    success: function(results) {...},
+    error: function(err) {...}
+  });
+```
+
+<a name="onmatch" />
+### onMatch(command)
+Event used with _Merge_ to be executed if _Merge_ matches a node.
+
+
+__Arguments__
+
+* `command` (string) - The command like _SET_ followed by what to do.
+
+__Example__
+
+```javascript
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , builder = graph.Builder();
+
+  builder
+    .reset()
+    .Merge('u', 'User', {field1: ..., field2: ...})
+    .relate('r1', 'GUESSED_RELATIONSHIP')
+    .toNode('n', 'Note', {field3: ..., field4: ...})
+    .onMatch('SET u.visited=timestamp(), n.visited=timestamp()');
+
+  graph.execute({
+    builder: builder,
+    cached: false,
+    aliases: {
+      u: 'user',
+      n: 'node'
+    },
+    success: function(results) {...},
+    error: function(err) {...}
+  });
+```
+
 <a name="delete" />
 ### Delete(placeholder)
 Deletes all the given nodes/relationships.
@@ -331,10 +406,9 @@ var graph = require("neo4jquery").setConnection(<driver object>)
   builder
     .reset()
     .Match('u', 'User', {...})
-    .With(['u'])
-    .Match('u2', 'User', {})
-    .With(['u', 'u2'])
-    .Delete(['u', 'u2', ...]);
+    .relate('r1', 'RELATIONSHIP', {...})
+    .toNode('u2', 'User', {...})
+    .Delete(['r1', 'u', 'u2']);
 
   graph.execute({
     builder: builder,
@@ -345,7 +419,6 @@ var graph = require("neo4jquery").setConnection(<driver object>)
 
 <a name="with" />
 ### With(placeholders)
-
 Sets a driver which is connected to a Neo4j database. The only requirement is that the driver implements a method called 'query'.
 
 __Arguments__
@@ -440,3 +513,37 @@ var graph = require("neo4jquery").setConnection(<driver object>)
     error: function(err) {...}
   });
 ```
+
+<a name="foreachcondition" />
+### ForeachCondition(condition, query)
+
+Adds a cypher foreach loop to the query to update the nodes in a list.
+
+__Arguments__
+
+* `condition` (string) - The condition to iterate over a list of nodes.
+* `query` (string) - The update command.
+
+__Example__
+
+```javascript
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , builder = graph.Builder();
+
+  builder
+    .reset()
+    .Match('u', 'User')
+    .Where("u.updatedAt > {timestamp}", {timestamp: new Date().getTime() - 3600})
+    .ForeachCondition('user IN u', 'SET u.visited=true');
+
+  graph.execute({
+    builder: builder,
+    cached: false,
+    aliases: {
+      u: 'user'
+    },
+    success: function(results) {...},
+    error: function(err) {...}
+  });
+```
+

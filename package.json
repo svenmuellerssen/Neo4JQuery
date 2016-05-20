@@ -1,25 +1,32 @@
 {
-  "name": "Neo4JQuery",
-  "version": "0.1.0",
-  "description": "Library to make Cypher easy to use with method chaining.",
-  "homepage": "http://www.neo4jquery.org",
-    "keywords": [
-    "util",
-    "database",
-    "neo4j",
-    "graph"
-    ],
-  "author": {
-    "name": "Sven Mueller",
-    "email": "sven.mueller@localdomain.org"
+  "name": "neo4jquery",
+  "version": "0.1.0-alpha.1",
+  "description": "Module that handles neo4j database cypher syntax as method calls.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependenncies": {
+    "underscore": "1.6.0",
+    "async": "0.9.0"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/svenmuellerssen/Neo4jQuery.git"
+    "url": "https://github.com/svenmuellerssen/Neo4JQuery.git"
   },
-  "main": "index.php",
-  "dependencies": {
-    "underscore": "1.6.0",
-    "async": "0.9.0"
+  "keywords": [
+    "neo4jquery",
+    "neo4j",
+    "graph database",
+    "cypher",
+    "query"
+  ],
+  "author": {
+	"Sven Mueller",
+	"svenmue@localdomain.org"
+  },
+  "license": "LGPL",
+  "bugs": {
+    "url": "https://github.com/svenmuellerssen/Neo4JQuery/issues"
   }
 }
