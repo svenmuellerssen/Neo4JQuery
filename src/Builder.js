@@ -101,9 +101,6 @@ var Builder = function() {
     return this;
   };
 
-  this.OptionalMatch = function(placeholder, label, parameter) {
-    return this.Match(placeholder, label, true, parameter);
-  };
   /**
    *
    * @param placeholder
@@ -112,7 +109,19 @@ var Builder = function() {
    * @returns {Builder}
    * @constructor
    */
-  this.AddMatch = function(placeholder, label, parameter) {
+  this.OptionalMatch = function(placeholder, label, parameter) {
+    return this.Match(placeholder, label, true, parameter);
+  };
+
+  /**
+   *
+   * @param placeholder
+   * @param label
+   * @param parameter
+   * @returns {Builder}
+   * @constructor
+   */
+  this.toNode = function(placeholder, label, parameter) {
     queries.push(this.getNodeQuery(placeholder, label, parameter));
     QueryPlaceholders.push(placeholder);
     return this;
@@ -165,7 +174,7 @@ var Builder = function() {
    * @param parameter
    * @returns {Builder}
    */
-  this.AddRelated = function(relationPlaceholder, label, parameter) {
+  this.relate = function(relationPlaceholder, label, parameter) {
     relationPlaceholder = relationPlaceholder || 'ar';
     label = label || '';
 
