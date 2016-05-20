@@ -1,6 +1,6 @@
 {
   "name": "neo4jquery",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Module that handles neo4j database cypher syntax as method calls.",
   "main": "index.js",
   "scripts": {
