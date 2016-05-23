@@ -1,1 +1,1 @@
-module.exports = require('./src/neo4j').singleton();
+module.exports = require('./src/neo4jquery').singleton();

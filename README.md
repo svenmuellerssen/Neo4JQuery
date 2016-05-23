@@ -79,10 +79,55 @@ var graph = require("neo4jquery").setConnection(<driver object>)
     });
 ```
 
-<a name="builder" />
-### Builder()
+<a name="call" />
+### Call(domain, procedureName, callback)
 
-Get the Cypher builder object.
+Calls a stored procedure in the graph database (available at v3.0 of Neo4J).
+It is also possible to pass-in the two parts of the procedure name only in domain like `domain = 'com.example.test.lib.hasRelation()'`.
+
+__Arguments__
+
+* `domain` (string) - The domain part of the stored procedure like 'com.example.test.lib'.
+* `procedureName` (string) - The name of the procedure as function call ('hasRelation()').
+* `callback` (function) - Callback function with parameters 'error' and result as array list.
+
+__Example__
+
+```javascript
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , domain = "com.example.test.lib"
+  , procedureName = "hasRelation()";
+
+  graph.Call(domain, procedureName, function(err, list) {
+      if (err || void 0 === list) {
+        callback(err, void 0);
+      } else {
+        // some stuff here with list
+        var user = list[0];
+      }
+    });
+```
+
+Or you can shorten the call by using this:
+
+```javascript
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , completeProcedureName = "com.example.test.lib.hasRelation()";
+
+  graph.Call(completeProcedureName, function(err, list) {
+      if (err || void 0 === list) {
+        callback(err, void 0);
+      } else {
+        // some stuff here with list
+        var user = list[0];
+      }
+    });
+```
+
+<a name="builder" />
+### Builder
+
+The Cypher builder object.
 
 __Arguments__
 
@@ -92,8 +137,10 @@ __Example__
 
 ```javascript
 var graph = require("neo4jquery").setConnection(<driver object>)
-  , builder = graph.Builder();
+  , builder = graph.Builder;
 
+  ...
+  ...
 ```
 
 <a name="run" />
