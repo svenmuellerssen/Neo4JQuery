@@ -5,7 +5,10 @@ var _ = require('underscore')
   , Builder = require('./Builder')
   , _graphInstance = null;
 
-
+/**
+ * @todo Change all operations on array into ops of linked list (is faster).
+ * @constructor
+ */
 var Neo4JQuery = function() {
   "use strict";
 
