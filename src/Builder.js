@@ -564,11 +564,19 @@ var Builder = function () {
   this.Create = function (placeholder, labels, parameters) {
     'use strict'
 
-    labels = ':' + labels.join(':') + ' '
-    var string = 'WITH ' + parameters + ' AS properties'
-    string += 'UNWIND properties AS property'
-    string += 'CREATE (' + placeholder + labels + ')'
-    string += 'SET ' + placeholder + ' += property'
+    if (labels) {
+      labels = ':' + labels.join(':')
+    } else {
+      labels = ''
+    }
+
+    var string = 'CREATE (' + placeholder + labels + ')'
+    if (parameters) {
+      string = 'WITH ' + placeholder + ', ' + parameters + ' AS properties'
+      string += 'UNWIND properties AS property'
+      string += 'SET ' + placeholder + ' += property'
+    }
+
 
     queries.push(string)
 
