@@ -1,86 +1,76 @@
-"use strict";
+'use strict'
 
-var _instance = null
-  , _ = require('underscore');
+var _instance = null,
+  _ = require('underscore')
 
 /**
  * @todo Implement options objects as method signature to pass in parameter into builder methods.
  */
-var Builder = function() {
-  "use strict";
+var Builder = function () {
+  'use strict'
 
-  var queries = []
-    , QueryPlaceholders = []
-    , uniqueIds = []
-    , parameters = {};
+  var queries = [],
+    QueryPlaceholders = [],
+    uniqueIds = [],
+    parameters = {}
 
-  this.MATCH = 1;
-  this.OPTIONAL_MATCH = 2;
-  this.START = 3;
-  this.CREATE = 4;
-  this.CREATE_UNIQUE = 5;
-  this.DELETE = 6;
-  this.MERGE =7;
-  
-  this.AGGREGATE_SUM=1;
-  this.AGGREGATE_COUNT=2;
-  this.AGGREGATE_AVG=3;
-  this.AGGREGATE_MIN=4;
-  this.AGGREGATE_MAX=5;
-  this.AGGREGATE_COLLECT=6;
-  this.AGGREGATE_FILTER=7;
-  this.AGGREGATE_EXTRACT=8;
-  
+  this.MATCH = 1
+  this.OPTIONAL_MATCH = 2
+  this.START = 3
+  this.CREATE = 4
+  this.CREATE_UNIQUE = 5
+  this.DELETE = 6
+  this.MERGE = 7
+
+  this.AGGREGATE_SUM = 1
+  this.AGGREGATE_COUNT = 2
+  this.AGGREGATE_AVG = 3
+  this.AGGREGATE_MIN = 4
+  this.AGGREGATE_MAX = 5
+  this.AGGREGATE_COLLECT = 6
+  this.AGGREGATE_FILTER = 7
+  this.AGGREGATE_EXTRACT = 8
+
   /**
    *
    * @returns {string}
    * @todo Implement 'returned' with aliases!!
    */
-  this.getQuery = function(aliases) {
-    "use strict";
+  this.getQuery = function (aliases) {
+    'use strict'
 
-    aliases = (aliases && !_.isEmpty(aliases)) ? _.keys(aliases) : [];
+    aliases = (aliases && !_.isEmpty(aliases)) ? _.keys(aliases) : []
 
-    var me = this
-      , query = "";
+    var me = this,
+      query = ''
 
     if (me.hasQueries()) {
       // Concat all queries.
-      query = queries.join('');
-
-      // Get the placeholders for return them...
-      if (aliases.length == 0 && Array.isArray(QueryPlaceholders) && QueryPlaceholders.length > 0) {
-        // Return placeholders.
-        query += ' RETURN ' + QueryPlaceholders.join(', ');
-      } else {
-        // ... or have given placeholder to return.
-        aliases = _.unique(aliases);
-        query += ' RETURN ' + aliases.join(', ');
-      }
+      query = queries.join('')
     }
 
-    return query;
-  };
+    return query
+  }
 
   /**
    *
    * @returns {object}
    */
-  this.getParameters = function() {
-    "use strict";
+  this.getParameters = function () {
+    'use strict'
 
-    return parameters;
-  };
+    return parameters
+  }
 
   /**
    *
    * @returns {boolean}
    */
-  this.hasQueries = function() {
-    "use strict";
+  this.hasQueries = function () {
+    'use strict'
 
-    return (queries.length > 0);
-  };
+    return (queries.length > 0)
+  }
 
   /**
    *
@@ -90,42 +80,28 @@ var Builder = function() {
    * @param parameter
    * @returns {Builder}
    */
-  this.Match = function(placeholder, label, optional, parameter) {
-    "use strict";
+  this.Match = function (placeholder, label, optional, parameter) {
+    'use strict'
 
-    if(typeof optional !== 'boolean') {
-        parameter = optional;
-        optional = false;
+    if (typeof optional !== 'boolean') {
+      parameter = optional
+      optional = false
     }
-    var query = '';
+    var query = ''
 
     if (optional === true) {
-        query = ' OPTIONAL MATCH ';
+      query = ' OPTIONAL MATCH '
     } else {
-    	query = ' MATCH ';
-	  }
+      query = ' MATCH '
+    }
 
-    query += this.getNodeQuery(placeholder, label, parameter);
-    queries.push(query);
+    query += this.getNodeQuery(placeholder, label, parameter)
+    queries.push(query)
 
-    QueryPlaceholders.push(placeholder);
+    QueryPlaceholders.push(placeholder)
 
-    return this;
-  };
-
-  /**
-   *
-   * @param placeholder
-   * @param label
-   * @param parameter
-   * @returns {Builder}
-   * @constructor
-   */
-  this.OptionalMatch = function(placeholder, label, parameter) {
-    "use strict";
-
-    return this.Match(placeholder, label, true, parameter);
-  };
+    return this
+  }
 
   /**
    *
@@ -135,13 +111,27 @@ var Builder = function() {
    * @returns {Builder}
    * @constructor
    */
-  this.toNode = function(placeholder, label, parameter) {
-    "use strict";
+  this.OptionalMatch = function (placeholder, label, parameter) {
+    'use strict'
 
-    queries.push(this.getNodeQuery(placeholder, label, parameter));
-    QueryPlaceholders.push(placeholder);
-    return this;
-  };
+    return this.Match(placeholder, label, true, parameter)
+  }
+
+  /**
+   *
+   * @param placeholder
+   * @param label
+   * @param parameter
+   * @returns {Builder}
+   * @constructor
+   */
+  this.toNode = function (placeholder, label, parameter) {
+    'use strict'
+
+    queries.push(this.getNodeQuery(placeholder, label, parameter))
+    QueryPlaceholders.push(placeholder)
+    return this
+  }
 
   /**
    *
@@ -151,39 +141,39 @@ var Builder = function() {
    * @param parameter
    * @returns {Builder}
    */
-  this.Related = function(placeholders, relationPlaceholder, label, parameter) {
-    "use strict";
+  this.Related = function (placeholders, relationPlaceholder, label, parameter) {
+    'use strict'
 
-    placeholders = (Array.isArray(placeholders) && placeholders.length > 0) ? placeholders : [];
-    parameter = parameter || {};
-    relationPlaceholder = relationPlaceholder || '';
-    label = label || '';
+    placeholders = (Array.isArray(placeholders) && placeholders.length > 0) ? placeholders : []
+    parameter = parameter || {}
+    relationPlaceholder = relationPlaceholder || ''
+    label = label || ''
 
     if (label !== '') {
-      label = ':'.concat(label);
+      label = ':'.concat(label)
     }
 
-    var me = this
-      , query = '';
+    var me = this,
+      query = ''
 
-    if (placeholders.length == 0 ) {
-        return me;
+    if (placeholders.length == 0) {
+      return me
     } else {
-      query = '(' + placeholders[0] + ')-[' + relationPlaceholder + label;
+      query = '(' + placeholders[0] + ')-[' + relationPlaceholder + label
 
       if (parameter && !_.isEmpty(parameter)) {
         query += ' ' + me.prepareParameter(':', parameter) + ']-'
       } else {
-        query += ']-';
+        query += ']-'
       }
 
-      query += '(' + placeholders[1] + ') ';
+      query += '(' + placeholders[1] + ') '
 
-      queries.push(query);
+      queries.push(query)
 
-      return me;
+      return me
     }
-  };
+  }
 
   /**
    *
@@ -192,28 +182,28 @@ var Builder = function() {
    * @param parameter
    * @returns {Builder}
    */
-  this.relate = function(relationPlaceholder, label, parameter) {
-    "use strict";
+  this.relate = function (relationPlaceholder, label, parameter) {
+    'use strict'
 
-    relationPlaceholder = relationPlaceholder || 'ar';
-    label = label || '';
+    relationPlaceholder = relationPlaceholder || 'ar'
+    label = label || ''
 
     if (label !== '') {
-        label = ':'.concat(label);
+      label = ':'.concat(label)
     }
 
-    var me = this
-      , query = '-['+ relationPlaceholder + label ;
+    var me = this,
+      query = '-[' + relationPlaceholder + label
 
     if (!_.isNull(parameter)) {
-      query += ' ' + me.prepareParameter(parameter);
+      query += ' ' + me.prepareParameter(parameter)
     }
 
-    query += ']-';
+    query += ']-'
 
-    queries.push(query);
-    return me;
-  };
+    queries.push(query)
+    return me
+  }
 
   /**
    *
@@ -222,21 +212,21 @@ var Builder = function() {
    * @param parameter
    * @returns {Builder}
    */
-  this.Merge = function(placeholder, label, parameter) {
-    "use strict";
+  this.Merge = function (placeholder, label, parameter) {
+    'use strict'
 
     if (_.isNull(placeholder)) {
-      placeholder = 't';
+      placeholder = 't'
     }
 
-    var query = ' MERGE ';
-    query += this.getNodeQuery(placeholder, label, parameter);
+    var query = ' MERGE '
+    query += this.getNodeQuery(placeholder, label, parameter)
 
-    queries.push(query);
-    QueryPlaceholders.push(placeholder);
+    queries.push(query)
+    QueryPlaceholders.push(placeholder)
 
-    return this;
-  };
+    return this
+  }
 
   /**
    *
@@ -245,33 +235,30 @@ var Builder = function() {
    * @param parameter
    * @returns {string}
    */
-  this.getNodeQuery = function(placeholder, label, parameter) {
-    "use strict";
+  this.getNodeQuery = function (placeholder, label, parameter) {
+    'use strict'
 
-    placeholder = placeholder || null;
-    parameter = parameter || {};
-    label = label || '';
+    placeholder = placeholder || null
+    parameter = parameter || {}
+    label = label || ''
 
-    var me = this
-      , query = '';
+    var me = this,
+      query = ''
 
     if (_.isNull(placeholder)) {
-      placeholder = 'at';
+      placeholder = 'at'
     }
 
     if (label !== '') {
-      label = ':'.concat(label);
+      label = ':'.concat(label)
     }
 
-    query += '(' + placeholder + label;
+    query += '(' + placeholder + label
 
-    if (parameter && !_.isEmpty(parameter))
-      query += ' ' + me.prepareParameter(':', parameter) + ')';
-    else
-      query += ')';
+    if (parameter && !_.isEmpty(parameter)) { query += ' ' + me.prepareParameter(':', parameter) + ')' } else { query += ')' }
 
-    return query;
-  };
+    return query
+  }
 
 //  var getRelationQuery = function() {
 //
@@ -285,125 +272,120 @@ var Builder = function() {
    * @param parameter
    * @returns {Builder}
    */
-  this.MergeRelationShip = function(nodes, placeholder, label, parameter) {
-    "use strict";
+  this.MergeRelationShip = function (nodes, placeholder, label, parameter) {
+    'use strict'
 
-    nodes = nodes || [];
+    nodes = nodes || []
 
     if (!parameter && typeof label !== 'string') {
-      parameter = label;
-      label = placeholder;
-
+      parameter = label
+      label = placeholder
     } else {
-      placeholder = placeholder || null;
-      label = label || '';
-      parameter = parameter || {};
+      placeholder = placeholder || null
+      label = label || ''
+      parameter = parameter || {}
     }
 
     if (nodes.length < 2) {
-      return this;
+      return this
     } else {
-      var me = this;
+      var me = this
 
       if (_.isNull(placeholder)) {
         placeholder = 'r'
       }
 
-      var string = ' MERGE (' + nodes[0] + ')-' + '[' + placeholder;
+      var string = ' MERGE (' + nodes[0] + ')-' + '[' + placeholder
       if (label !== '') {
-        string += ':' + label + ' ';
+        string += ':' + label + ' '
       }
 
-      string += me.prepareParameter(':', parameter) + ']-(' + nodes[1] + ') ';
+      string += me.prepareParameter(':', parameter) + ']-(' + nodes[1] + ') '
 
-      queries.push(string);
-      QueryPlaceholders.push(placeholder);
+      queries.push(string)
+      QueryPlaceholders.push(placeholder)
 
-      return this;
+      return this
     }
-  };
+  }
 
   /**
    *
    * @param command
    * @returns {Builder}
    */
-  this.onCreate = function(command) {
-    "use strict";
+  this.onCreate = function (command) {
+    'use strict'
 
-    command = command || null;
-    var string = '';
+    command = command || null
+    var string = ''
 
-    if (!_.isNull(command))
-      string = ' ON CREATE ' + command;
+    if (!_.isNull(command)) { string = ' ON CREATE ' + command }
 
-    if (string !== '')
-      queries.push(string);
+    if (string !== '') { queries.push(string) }
 
-    return this;
-  };
+    return this
+  }
 
   /**
    *
    * @param command
    * @returns {Builder}
    */
-  this.onMatch = function(command) {
-    "use strict";
+  this.onMatch = function (command) {
+    'use strict'
 
-    command = command || null;
-    var string = '';
+    command = command || null
+    var string = ''
 
-    if (!_.isNull(command))
-      string = ' ON MATCH ' + command;
+    if (!_.isNull(command)) { string = ' ON MATCH ' + command }
 
-    if (string !== '')
-      queries.push(string);
+    if (string !== '') { queries.push(string) }
 
-    return this;
-  };
+    return this
+  }
 
   /**
    *
    * @param placeholder
    * @returns {Builder}
    */
-  this.Delete = function(placeholder) {
-    "use strict";
+  this.Delete = function (placeholder) {
+    'use strict'
 
-    placeholder = placeholder || null;
+    placeholder = placeholder || null
 
     if (!_.isNull(placeholder)) {
-      var string = '';
+      var string = ''
       if (typeof placeholder === 'string') {
-        string += ' DELETE ' + placeholder;
+        string += ' DELETE ' + placeholder
       } else if (Array.isArray(placeholder) && placeholder.length > 0) {
-        string += ' DELETE ' + placeholder.join(', ');
+        string += ' DELETE ' + placeholder.join(', ')
       }
 
       if (string !== '') {
-        queries.push(string);
+        queries.push(string)
       }
     }
 
-    return this;
-  };
+    return this
+  }
 
   /**
    *
    * @param placeholders
    * @returns {Builder}
    */
-  this.With = function(placeholders) {
-    "use strict";
+  this.With = function (placeholders) {
+    'use strict'
 
     if (Array.isArray(placeholders) && placeholders.length !== 0) {
-      var string = ' WITH ' + placeholders.join(', ');
-      queries.push(string);
+      var string = ' WITH ' + placeholders.join(', ')
+      queries.push(string)
     }
 
-    return this;
-  };
+    return this
+  }
 
   /**
    *
@@ -411,20 +393,18 @@ var Builder = function() {
    * @param parameter
    * @returns {Builder}
    */
-  this.Where = function(string, parameter) {
-    "use strict";
+  this.Where = function (string, parameter) {
+    'use strict'
 
-    string = string || null;
-    parameter = parameter || null;
+    string = string || null
+    parameter = parameter || null
 
-    if (!_.isNull(string) && typeof string === 'string')
-      queries.push(' WHERE ' + string);
+    if (!_.isNull(string) && typeof string === 'string') { queries.push(' WHERE ' + string) }
 
-    if (!_.isNull(parameter))
-      parameters = _.extend(parameters, parameter);
+    if (!_.isNull(parameter)) { parameters = _.extend(parameters, parameter) }
 
-    return this;
-  };
+    return this
+  }
 
   /**
    *
@@ -432,18 +412,171 @@ var Builder = function() {
    * @param parameter
    * @returns {Builder}
    */
-  this.Set = function(placeholder, parameter) {
-    "use strict";
+  this.Set = function (placeholder, parameter) {
+    'use strict'
 
     if (placeholder && placeholder !== '') {
-      var me = this
-        , string = ' SET ' + me.prepareParameter(placeholder + '.', parameter);
+      var me = this,
+        string = ' SET ' + me.prepareParameter(placeholder + '.', parameter)
 
-      queries.push(string);
+      queries.push(string)
     }
 
-    return this;
-  };
+    return this
+  }
+
+  /**
+   * Extended work for queryBuilder created by Sven Mueller (svenmue@localdomain.org)
+   * github: github.com/svenmuellerssen/Neo4JQuery
+   *
+   * Added features: REMOVE, SKIP, LIMIT, RETURN, CREATE (single and multiple nodes)
+   * Date: 28/04/2017
+   * Author: Jesus Bermudez @jesus_bv | github.com/jesusbv | jesusbermudez@quillcontent.com
+   */
+
+  this.prepareFields = function (placeholder, parameters) {
+    'use strict'
+
+    var string = ''
+    let keys = _.keys(parameters)
+
+    keys.forEach(function(key) {
+      var separator = (key === 'property' ? '.' : ':')
+      string += placeholder + separator + parameters[key] + ','
+    })
+
+    string = string.slice(0, -1)
+
+    return string
+  }
+
+  /**
+   *
+   * @param placeholder
+   * @param parameter
+   * @returns {Builder}
+   */
+  this.Remove = function (placeholder, parameters) {
+    'use strict'
+
+    if (placeholder && placeholder !== '') {
+      var me = this,
+        string = ' REMOVE ' + me.prepareFields(placeholder, parameters)
+      queries.push(string)
+    }
+
+    return this
+  }
+
+  /**
+   *
+   * @param expresion Any expression that evaluates to a positive integer 
+   * — however the expression cannot refer to nodes or relationships
+   * @returns {Builder}
+   */
+  this.Skip = function (expresion) {
+    'use strict'
+
+    var string = ' SKIP ' +  expresion
+    queries.push(string)
+
+    return this
+  }
+
+  /**
+   *
+   * @param expresion Any expression that evaluates to a positive integer 
+   * — however the expression cannot refer to nodes or relationships
+   * @returns {Builder}
+   */
+  this.Limit = function (expresion) {
+    'use strict'
+
+    var string = ' LIMIT ' +  expresion
+    queries.push(string)
+
+    return this
+  }
+
+  /**
+   *
+   * @param placeholder
+   * @param parameters
+   * @param direction [ASC | DESC]
+   * @returns {Builder}
+   */
+  this.Sort = function (placeholder, parameters, direction) {
+    'use strict'
+
+    if (placeholder && placeholder !== '') {
+      var me = this,
+        string = ' ORDER BY '
+
+      if (!direction) {
+        direction = ''
+      } else {
+        direction = ' ' + direction
+      }
+
+      parameters.forEach(function (parameter) {
+        string += placeholder + '.' + parameter + direction + ','
+      })
+      string = string.slice(0, -1)
+
+      queries.push(string)
+    }
+
+    return this
+  }
+
+  this.Return = function (aliases) {
+    'use strict'
+
+    var string = ''
+
+    if (!Array.isArray(aliases)) {
+      console.error('The aliases for RETURN CLAUSE must be an array')
+      throw new Error('The aliases for RETURN CLAUSE must be an array')
+    }
+    // Get the placeholders for return them...
+    if (aliases.length == 0 && Array.isArray(QueryPlaceholders) && QueryPlaceholders.length > 0) {
+      // Return placeholders.
+      string += ' RETURN ' + QueryPlaceholders.join(', ')
+    } else {
+      // ... or have given placeholder to return.
+      aliases = _.unique(aliases)
+      string += ' RETURN ' + aliases.join(', ')
+    }
+
+    queries.push(string)
+
+    return this
+  }
+
+  /**
+   *
+   * @param placeholders
+   * @param labels Array String representing the labels
+   * @param parameters Array of json objects with the properties
+   * @returns {Builder}
+   */
+
+  this.Create = function (placeholder, labels, parameters) {
+    'use strict'
+
+    labels = ':' + labels.join(':') + ' '
+    var string = 'WITH ' + parameters + ' AS properties'
+    string += 'UNWIND properties AS property'
+    string += 'CREATE (' + placeholder + labels + ')'
+    string += 'SET ' + placeholder + ' += property'
+
+    queries.push(string)
+
+    return this
+  }
+
+  // END NEW=====================================
+  // QUILL ======================================
 
   /**
    *
@@ -472,19 +605,19 @@ var Builder = function() {
    * @param query
    * @returns {Builder}
    */
-  this.ForeachCondition = function(condition, query) {
-    "use strict";
+  this.ForeachCondition = function (condition, query) {
+    'use strict'
 
-    condition = condition || null;
-    query = query || null;
+    condition = condition || null
+    query = query || null
 
     if (!_.isNull(query) && typeof condition === 'string') {
-      var string = ' FOREACH (' + condition + ' | \n' + query + ')';
-      queries.push(string);
+      var string = ' FOREACH (' + condition + ' | \n' + query + ')'
+      queries.push(string)
     }
 
-    return this;
-  };
+    return this
+  }
 
     /**
      *
@@ -635,15 +768,15 @@ var Builder = function() {
    *
    * @returns {Builder}
    */
-  this.reset = function() {
-    "use strict";
+  this.reset = function () {
+    'use strict'
 
-    QueryPlaceholders = [];
-    queries = [];
-    uniqueIds.length = 0;
+    QueryPlaceholders = []
+    queries = []
+    uniqueIds.length = 0
 
-    return this;
-  };
+    return this
+  }
 
   /**
    *
@@ -651,57 +784,64 @@ var Builder = function() {
    * @param parameter
    * @returns {string}
    */
-  this.prepareParameter = function(separator, parameter) {
-    "use strict";
+  this.prepareParameter = function (separator, parameter) {
+    'use strict'
 
     if (!separator) {
-      parameter = separator;
-      separator = ':';
+      parameter = separator
+      separator = ':'
     }
 
-    var string = ''
-      , keys = _.keys(parameter);
+    var string = '',
+      keys = _.keys(parameter)
 
     if (separator === ':') {
-      string = '{';
+      string = '{'
     }
 
-    keys.forEach(function(key) {
-      "use strict";
+    keys.forEach(function (key) {
+      'use strict'
 
       if (separator === ':') {
         // Parameter format for node creation
         if (isNaN(parameter[key])) {
           if (uniqueIds.indexOf(parameter[key]) != -1) {
-            string += key + separator + ' ' + parameter[key] + ', ';
+            string += key + separator + ' ' + parameter[key] + ', '
           } else {
-            string += key + separator + ' "' + parameter[key] + '", ';
+            // NOTE: clarify this case
+            if (parameter[key].slice(-2) === '()') {
+              string += key + separator + ' ' + parameter[key] + ', '
+            } else {
+              // original case
+              string += key + separator + ' "' + parameter[key] + '", '
+            }
           }
         } else if (!isNaN(parameter[key]) && typeof parseFloat(parameter[key]) === 'number') {
-          string += key + separator + ' ' + parameter[key] + ', ';
+          string += key + separator + ' ' + parameter[key] + ', '
         }
-      } else if (separator.indexOf('.') != -1) {
-
+      } else if (separator.indexOf('.') !== -1) {
         if (isNaN(parameter[key])) {
-          if (uniqueIds.indexOf(parameter[key]) != -1) {
-            string += separator + key + '=' + parameter[key] + ', ';
+          if (uniqueIds.indexOf(parameter[key]) !== -1) {
+            string += separator + key + '=' + parameter[key] + ', '
           } else {
-            string += separator + key + '="' + parameter[key] + '", ';
+            if (parameter[key].slice(-2) === '()') {
+              string += separator + key + '=' + parameter[key] + ', '
+            } else {
+              string += separator + key + '="' + parameter[key] + '", '
+            }
           }
         } else if (!isNaN(parameter[key]) && typeof parseFloat(parameter[key]) === 'number') {
-          string += separator + key + '=' + parameter[key] + ', ';
+          string += separator + key + '=' + parameter[key] + ', '
         }
       }
+    })
 
-    });
+    if (string !== '{') { string = string.substr(0, string.length - 2) }
 
-    if (string !== '{')
-      string = string.substr(0, string.length - 2);
+    if (separator === ':') string += '}'
 
-    if (separator === ':') string += '}';
-
-    return string;
-  };
+    return string
+  }
 
     /**
      *
@@ -822,20 +962,20 @@ var Builder = function() {
 //        }
 //      }
 //    }
-  };
+}
 
 /**
  *
  * @returns {Builder}
  */
-Builder.singleton = function() {
-  "use strict";
+Builder.singleton = function () {
+  'use strict'
 
   if (_.isNull(_instance) === true) {
-    _instance = new Builder();
+    _instance = new Builder()
   }
 
-  return _instance;
-};
+  return _instance
+}
 
-module.exports = Builder;
+module.exports = Builder
