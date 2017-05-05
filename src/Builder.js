@@ -431,7 +431,7 @@ var Builder = function () {
    *
    * Added features: REMOVE, SKIP, LIMIT, RETURN, CREATE (single and multiple nodes)
    * Date: 28/04/2017
-   * Author: Jesus Bermudez @jesus_bv | github.com/jesusbv | jesusbermudez@quillcontent.com
+   * Author: Jesus Bermudez github.com/jesusbv | jesusbermudez@quillcontent.com
    */
 
   this.prepareFields = function (placeholder, parameters) {
