@@ -1,0 +1,178 @@
+Treiber: 
+* Die Auswahl, welchen Treibertyp die Bibliothek verwenden soll wird
+    über den Type der Konfiguration getroffen, also liegt in der Verantwortung 
+    des Konsumenten!
+* Es gibt die Auswahl zwischen dem alten REST API Konnektor (?) und dem neuen
+    Bolt Treiber.
+
+
+---------------------------------------------------------
+
+abstract class Driver:
+    abstract getType(): number;
+    abstract setGraphTypes(types?: any): Driver;
+    abstract connect(configuration: IBoltConfig|IRestAPIConfig|null): Driver;
+    abstract execute(sessionName: string, query: string, parameter: any): Promise<any>;
+    abstract close(): Driver;
+interface IDriverMap:
+---------------------------------------------------------
+
+class Rest Driver:
+
+    constructor(configuration: IRestAPIConfig|null);
+    getType(): number
+    setGraphTypes(types?: any): Rest
+    connect(configuration: IRestAPIConfig|null = null): Rest
+    canConnect(): boolean
+    execute(query: string, parameter: any): Promise<any>
+    close(): Rest
+    instance(configuration: IRestAPIConfig|null = null): Rest
+
+class RestAPIConfig-> Evtl. nicht benötigt:
+
+    constructor(config: IRestAPIConfig);
+
+interface IRestAPIConfig:
+
+---------------------------------------------------------
+
+class Bolt Driver:
+
+    constructor(configuration: IBoltConfig|null = null)
+    getType(): number 
+    isTransactionStarted(): boolean 
+    setGraphTypes(types: any|null = {}): Bolt
+    connect(configuration: IBoltConfig|null): Bolt
+    hasConnection(): boolean
+    close(): Bolt 
+    getSession(sessionName: string = 'default'): Neo4J.v1.Session|null
+    execute(sessionName: string = 'default', query: string, parameters: any): Promise<any>
+    getUrl(): string
+    instance(configuration: IBoltConfig|null = null): Bolt
+
+class BoltConfig-> Evtl. nicht benötigt:
+
+    constructor(config: IBoltConfig);
+
+interface IBoltConfig:
+interface SessionPool:
+
+---------------------------------------------------------
+
+class Builder:
+    getQuery(graphTypes: any = {}): string
+    getParameters(): any
+    hasQuery(): boolean
+    separator(): Builder
+    Start(condition: string, parameterValues: any = {}): Builder
+    Match(placeholder: string, label: string = '', parameterValues: any|null = null, optional: boolean = false): Builder
+    Merge(placeholder: string, label: string = '', parameterValues: any|null = null): Builder
+    Set(placeholders: string[]|string = '', values: any = {}): Builder
+    Where(property?: string, operator?: string, value?: string|number): Builder
+    AND(operator: string, property: string, value: string|number = ''): Builder
+    OR(): Builder
+    XOR(): Builder
+    buildQueryPart(operator: string, property: string, value: string|number = ''): string
+    With(populate: string[]|string): Builder
+    Return(populate: string[]|string = [], distinct: boolean = false): Builder
+    Exists(property: string): Builder
+    Left(original: string, length: number): Builder
+    LTrim(original: string): Builder
+    Replace(original: string, haystack: string, replace: string): Builder
+    Reverse(original: string): Builder
+    Right(original: string, length: number): Builder
+    RTrim(original: string): Builder
+    Split(original: string, splitDelimiter: string): Builder
+    Substring(original: string, start: number, length: number = 0): Builder
+    ToLower(original: string): Builder
+    ToUpper(original: string): Builder
+    ToString(original: string|number|boolean): Builder
+    Trim(original: string): Builder
+    AndFunction(func: string, args: IFunctionArguments): Builder
+    UsingIndexOn(placeholder: string, label: string, properties: string[]): Builder
+    OrderBy(condition: string = ''): Builder
+    Limit(limit: number = 100): Builder
+    Skip(skip: number = 0): Builder
+    CreateIndexOn(label: string, properties: string[] = []): void
+    DropIndexOn(label: string, properties: string[] = []): void
+    buildIndexStatement(keyword: string, label: string, properties: string[]): void
+    mergeIntoParameters(obj: any): Builder
+    buildParameterString(parameterValues: any = {}, separator: string|null = ':'): string
+    reset(): Builder
+    buildArrayFromString(stringList: string = ''): string[]
+    trimValue(value: string): string
+    static instance(): Builder
+
+enum CypherAggregationKeyWords:
+    COUNT
+    SUM
+    AVG
+    STDEV
+    STDEVP
+    MAX
+    MIN
+    COLLECT
+    PERCENTILE_DISC
+    PERCENTILE_CONT
+
+enum CypherFunctionKeyWords:
+    PREDICATE_FUNCTION_ALL
+    PREDICATE_FUNCTION_ANY
+    PREDICATE_FUNCTION_NONE
+    PREDICATE_FUNCTION_SINGLE
+
+enum CypherKeyWords:
+    START
+    MATCH
+    OPTIONAL_MATCH
+    MERGE
+    CREATE
+    DELETE
+    WHERE
+    WITH
+    SET
+    ORDER_BY
+    SKIP
+    LIMIT
+    RETURN
+    DISTINCT
+    CREATE_INDEX_ON
+    USING_INDEX_ON
+    DROP_INDEX_ON
+
+enum CypherOperatorKeyWords:
+  STARTS_WITH
+  NOT_STARTS_WITH
+  ENDS_WITH
+  NOT_ENDS_WITH
+  CONTAINS
+  NOT_CONTAINS
+  IS_NULL
+  LESS_THAN
+  EQUAL_THAN
+  IS_NOT_NULL
+  GREATER_THAN
+  LESS_EQUAL_THAN
+  GREATER_EQUAL_THAN
+  FUNCTION_EXISTS
+  FUNCTION_ALL
+  FUNCTION_ANY
+  FUNCTION_NONE
+  FUNCTION_SINGLE
+
+enum CypherStringFunctionKeyWorks:
+  FUNCTION_LEFT
+  FUNCTION_LTRIM
+  FUNCTION_REPLACE
+  FUNCTION_REVERSE
+  FUNCTION_RIGHT
+  FUNCTION_RTRIM
+  FUNCTION_SPLIT
+  FUNCTION_SUBSTRING
+  FUNCTION_TO_LOWER
+  FUNCTION_TO_UPPER
+  FUNCTION_TO_STRING
+  FUNCTION_TRIM
+  FUNCTION_EXISTS
+
+interface IFunctionArguments:

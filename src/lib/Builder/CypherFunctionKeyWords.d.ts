@@ -1,0 +1,6 @@
+export declare enum CypherFunctionKeyWords {
+    PREDICATE_FUNCTION_ALL = "ALL ",
+    PREDICATE_FUNCTION_ANY = "ANY ",
+    PREDICATE_FUNCTION_NONE = "NONE",
+    PREDICATE_FUNCTION_SINGLE = "SINGLE ",
+}

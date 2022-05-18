@@ -1,0 +1,22 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var CypherKeyWords;
+(function (CypherKeyWords) {
+    CypherKeyWords["START"] = "START ";
+    CypherKeyWords["MATCH"] = "MATCH ";
+    CypherKeyWords["OPTIONAL_MATCH"] = "OPTIONAL MATCH ";
+    CypherKeyWords["MERGE"] = "MERGE ";
+    CypherKeyWords["CREATE"] = "CREATE ";
+    CypherKeyWords["DELETE"] = "DELETE ";
+    CypherKeyWords["WHERE"] = "WHERE ";
+    CypherKeyWords["WITH"] = "WITH ";
+    CypherKeyWords["SET"] = "SET ";
+    CypherKeyWords["ORDER_BY"] = "ORDER BY ";
+    CypherKeyWords["SKIP"] = "SKIP ";
+    CypherKeyWords["LIMIT"] = "LIMIT ";
+    CypherKeyWords["RETURN"] = "RETURN ";
+    CypherKeyWords["DISTINCT"] = "DISTINCT ";
+    CypherKeyWords["CREATE_INDEX_ON"] = "CREATE INDEX ON ";
+    CypherKeyWords["USING_INDEX_ON"] = "USING INDEX ON ";
+    CypherKeyWords["DROP_INDEX_ON"] = "DROP INDEX ON ";
+})(CypherKeyWords = exports.CypherKeyWords || (exports.CypherKeyWords = {}));
