@@ -1,14 +1,14 @@
 {
   "name": "neo4jquery",
-  "version": "0.1.3",
+  "version": "0.2.1",
   "description": "Module that handles neo4j database cypher syntax as method calls.",
   "main": "index.js",
   "scripts": {
     "test": "mocha"
   },
   "dependencies": {
-    "underscore": "1.6.0",
-    "async": "0.9.0"
+    "async": "^3.2.3",
+    "underscore": "^1.13.3"
   },
   "repository": {
     "type": "git",

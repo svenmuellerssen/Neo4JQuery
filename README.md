@@ -593,4 +593,201 @@ var graph = require("neo4jquery").setConnection(<driver object>)
     error: function(err) {...}
   });
 ```
+<a name="remove" />
+### Remove(placeholder, parameter)
+
+Remove given properties from a node
+
+__Arguments__
+
+* `placeholder` (string) - The placeholder of the node.
+* `parameter` (object) - All parameters to be set as properties or labels in the node.
+
+__Example__
+
+```javascript
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , builder = graph.Builder();
+
+  builder
+    .reset()
+    .Match('u', 'User')
+    .Where("u.username={username} and u.password={password}", {username: 'testuser', password: 'password'})
+    .Remove('u', {property: 'username'});
+
+  graph.execute({
+    builder: builder,
+    cached: false,
+    aliases: {
+      u: 'user'
+    },
+    success: function(results) {...},
+    error: function(err) {...}
+  });
+```
+
+<a name="skip" />
+### Skip(parameter)
+
+Remove given properties from a node
+
+__Arguments__
+
+* `parameter` (expresion) - Any expression that evaluates to a positive integer 
+— however the expression cannot refer to nodes or relationships.
+
+__Example__
+
+```javascript
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , builder = graph.Builder();
+
+  builder
+    .reset()
+    .Match('u', 'User')
+    .Return('u')
+    .Skip(2);
+
+  graph.execute({
+    builder: builder,
+    cached: false,
+    aliases: {
+      u: 'user'
+    },
+    success: function(results) {...},
+    error: function(err) {...}
+  });
+```
+
+<a name="skip" />
+### Limit(parameter)
+
+Remove given properties from a node
+
+__Arguments__
+
+* `parameter` (expresion) - Any expression that evaluates to a positive integer 
+— however the expression cannot refer to nodes or relationships.
+
+__Example__
+
+```javascript
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , builder = graph.Builder();
+
+  builder
+    .reset()
+    .Match('u', 'User')
+    .Return('u')
+    .Limit(3);
+
+  graph.execute({
+    builder: builder,
+    cached: false,
+    aliases: {
+      u: 'user'
+    },
+    success: function(results) {...},
+    error: function(err) {...}
+  });
+```
+
+<a name="skip" />
+### Sort(placeholder, parameters, direction)
+
+Remove given properties from a node
+
+__Arguments__
+
+* `placeholder` (string) - The placeholder of the node.
+* `parameter` (array) - All properties to sort by the output.
+* `direction` (string) - Value to set the order direction (ASC | DESC).
+
+__Example__
+
+```javascript
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , builder = graph.Builder();
+
+  builder
+    .reset()
+    .Match('u', 'User')
+    .Return('u')
+    .Sort('u', ['name'], 'DESC');
+
+  graph.execute({
+    builder: builder,
+    cached: false,
+    aliases: {
+      u: 'user'
+    },
+    success: function(results) {...},
+    error: function(err) {...}
+  });
+```
+
+<a name="return" />
+### Return(aliases)
+
+Return given aliases as a response
+
+__Arguments__
+
+* `aliases` (array) - The aliases of the query to be returned. 
+If empty, it will return the placeholders found in the query??
+
+__Example__
+
+```javascript
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , builder = graph.Builder();
+
+  builder
+    .reset()
+    .Match('u', 'User')
+    .Return('u');
+
+  graph.execute({
+    builder: builder,
+    cached: false,
+    aliases: {
+      u: 'user'
+    },
+    success: function(results) {...},
+    error: function(err) {...}
+  });
+```
+
+<a name="return" />
+### Create(placeholder, labels, parameters)
+
+Creates a single or multiple nodes, set label/s and properties 
+
+__Arguments__
+
+* `placeholder` (string) - The placeholder of the node.
+* `labels` (array) - All labels to be created.
+* `parameters` (object) - Properties to be set in the nod e.
+
+__Example__
+
+```javascript
+var graph = require("neo4jquery").setConnection(<driver object>)
+  , builder = graph.Builder();
+
+  builder
+    .reset()
+    .Create('u', ['User', 'Developer'], {name: 'John Doe'})
+    .Return('u');
+
+  graph.execute({
+    builder: builder,
+    cached: false,
+    aliases: {
+      u: 'user'
+    },
+    success: function(results) {...},
+    error: function(err) {...}
+  });
+```
 
